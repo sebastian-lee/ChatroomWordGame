@@ -23,36 +23,44 @@ class UserList extends Component {
     super(props);
 
     this.state = {
-      userlist: "",
+      userScoreList: {}
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
   }
 
-  updateUserlist(userlist) {
-    //userlist is an array of names
-    var listItems = userlist.map(username => {
-      return <li key={username}>{username}</li>;
-    });
-    this.setState(() => ({ userlist: listItems }));
-  }
+  componentDidMount() {
+    this.props.socket.on("update userScorelist", userScoreList =>
+      this.setState(() => ({ userScoreList: userScoreList }))
+    );
 
-  componentDidMount(){
-    this.props.socket.on("update userlist", userlist => this.updateUserlist(userlist));
+    this.props.socket.on("update score", (username, score) =>{
+      let newScore = this.state.userScoreList;
+      newScore[username] = score;
+      this.setState(() => (
+        {userScorelist : newScore}
+      ))
+    }
+    );
   }
 
   render() {
+    let list = [];
+    for (var user in this.state.userScoreList) {
+      list.push(`${user}: ${this.state.userScoreList[user]}`);
+    }
+
     return (
       <UserListContainer>
         <UserListHeader>User List</UserListHeader>
-        <Users className="userlist">{this.state.userlist}</Users>
+        <Users className="userlist">{list.map(user => <li>{user}</li>)}</Users>
       </UserListContainer>
     );
   }
 }
 
 UserList.propTypes = {
-    socket: PropTypes.object.isRequired
-}
+  socket: PropTypes.object.isRequired
+};
 
 export default UserList;

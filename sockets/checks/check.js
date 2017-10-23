@@ -1,5 +1,6 @@
 var sendTargetUser = require("../updates/update.js").sendTargetUser;
 var sendTargetWord = require("../updates/update.js").sendTargetWord;
+var sendScore = require("../updates/update.js").sendScore;
 
 var getRandomTargetUser = require("../util/random.js").getRandomTargetUser;
 var getRandomTargetWord = require("../util/random.js").getRandomTargetWord;
@@ -57,6 +58,11 @@ function checkForTargetWord(msg, socket, userList, waitingForTarget, io) {
           waitingForTarget
         );
         userObj.targetWord = getRandomTargetWord(userObj.targetWord);
+        
+        //Increment score and send
+        userObj.score += 1;
+        //sendUserList(io, userList);
+        sendScore(io, userObj.username, userObj.score);
 
         //Update user with new targets
         sendTargetWord(userID, io, userList);

@@ -6,19 +6,23 @@ function removeUser(addedUser, socket, io, userList, waitingForTarget) {
     waitingForTarget.filter((user,index) => {
       //Look for disconnected user if he is on the waitingList and remove him
       if(user == socket.id){
-        
-        waitingForTarget = waitingForTarget.slice(0,index).concat(waitingForTarget.slice(index+1));
+        if(waitingForTarget.length > 1){
+          waitingForTarget = waitingForTarget.slice(0,index).concat(waitingForTarget.slice(index+1));
+        }else{
+          waitingForTarget = [];
+        }
       }
     });
 
     io.emit("user disconnected", username);
+    //Subtract user list length
     if (userList.length > 0) {
       userList.length--;
     }
     delete userList.users[socket.id];
-    console.log(waitingForTarget, userList);
     return waitingForTarget;
   }
+  return waitingForTarget;
 }
 
 module.exports = removeUser;

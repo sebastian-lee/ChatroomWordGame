@@ -17,16 +17,21 @@ function sendTargetWord(targetSocket, io, userList) {
     .emit("new target word", userList.users[targetSocket].targetWord);
 }
 
-function sendUsernameList(io, userList) {
-  let usernameArray = [];
+function sendUserList(io, userList) {
+  let userScoreList = {};
   for (user in userList.users) {
-    usernameArray.push(userList.users[user].username);
+    userScoreList[userList.users[user].username] = userList.users[user].score;
   }
-  io.emit("update userlist", usernameArray);
+  io.emit("update userScorelist", userScoreList);
+}
+
+function sendScore(io, username, score) {
+  io.emit("update score", username, score);
 }
 
 module.exports = {
-    sendTargetUser,
-    sendTargetWord,
-    sendUsernameList
+  sendTargetUser,
+  sendTargetWord,
+  sendUserList,
+  sendScore
 };

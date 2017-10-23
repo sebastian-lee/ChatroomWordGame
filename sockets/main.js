@@ -5,7 +5,7 @@ var getRandomTargetWord = require("./util/random.js").getRandomTargetWord;
 //Import from Updates
 var sendTargetUser = require("./updates/update.js").sendTargetUser;
 var sendTargetWord = require("./updates/update.js").sendTargetWord;
-var sendUsernameList = require("./updates/update.js").sendUsernameList; 
+var sendUserList = require("./updates/update.js").sendUserList; 
 
 //Import from Checks
 var checkWaitingList = require("./checks/check.js").checkWaitingList;
@@ -33,7 +33,7 @@ module.exports = function(io) {
      * Add the new user to the list of users
      * with a unique name 
      */
-
+    
     socket.on("add username", function(username) {
       //Sanitize username
       username = String(username);
@@ -43,8 +43,9 @@ module.exports = function(io) {
         //Check if anyone is on the waiting list and give them a target
         checkWaitingList(userList, waitingForTarget, io);
         socket.emit("logged in", true);
+        
         //send updated userlist
-        sendUsernameList(io, userList);
+        sendUserList(io, userList);
       }
     });
 
@@ -73,7 +74,7 @@ module.exports = function(io) {
       }
 
       //send updated userlist
-      sendUsernameList(io, userList);
+      sendUserList(io, userList);
     });
 
     socket.on("chat message", function(msg) {

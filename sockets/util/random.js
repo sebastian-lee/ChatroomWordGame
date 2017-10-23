@@ -19,7 +19,6 @@ function getRandomUser(userList) {
 //Returns a random user socketID that is not self
 function getRandomTargetUser(self, userList, waitingForTarget) {
   //If there are no other users put on waiting
-
   if (userList.length <= 1) {
     waitingForTarget.push(self);
     return null;
