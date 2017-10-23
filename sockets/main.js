@@ -8,9 +8,12 @@ var sendTargetWord = require("./updates/update.js").sendTargetWord;
 var sendUsernameList = require("./updates/update.js").sendUsernameList; 
 
 //Import from Checks
-var checkUniqueUsername = require("./checks/check.js").checkUniqueUsername;
 var checkWaitingList = require("./checks/check.js").checkWaitingList;
 var checkForTargetWord = require("./checks/check.js").checkForTargetWord; 
+
+//Import from Users
+var addUser = require("./users/addUser.js");
+var removeUser = require("./users/removeUser.js");
 
 module.exports = function(io) {
   //User List
@@ -21,51 +24,6 @@ module.exports = function(io) {
 
   //List of waiting socket ids
   var waitingForTarget = [];
-
-  function addUser(addedUser, socket, username) {
-    //If the user is already added return
-    if (addedUser) {
-      console.log("User already added");
-      return false;
-    }
-
-    if (!checkUniqueUsername(socket, username, userList)) {
-      socket.emit("not unique username");
-      return false;
-    }
-
-    console.log("a user connected");
-    io.emit("user connected", username);
-    userList.length++;
-
-    userList.users[socket.id] = {
-      username: username,
-      //Give user a target word and target user
-      targetWord: getRandomTargetWord(),
-      //Pick a random user from list of clients, if no one else, put on waiting list for new players.
-      targetUserID: getRandomTargetUser(socket.id, userList, waitingForTarget)
-    };
-
-    //Send the target word and user to the client
-    sendTargetWord(socket.id, io, userList);
-    //If there is a target userID emit to client
-    if (userList.users[socket.id].targetUserID != null) {
-      sendTargetUser(socket.id, io, userList);
-    }
-    return true;
-  }
-
-  function removeUser(addedUser, socket) {
-    if (addedUser) {
-      console.log("user disconnected");
-      username = userList.users[socket.id].username;
-      io.emit("user disconnected", username);
-      if (userList.length > 0) {
-        userList.length--;
-      }
-      delete userList.users[socket.id];
-    }
-  }
 
   io.on("connection", socket => {
     //New user connection
@@ -80,7 +38,7 @@ module.exports = function(io) {
       //Sanitize username
       username = String(username);
       console.log("new username " + username);
-      if (addUser(addedUser, socket, username)) {
+      if (addUser(addedUser, socket, io, username, userList, waitingForTarget)) {
         addedUser = true;
         //Check if anyone is on the waiting list and give them a target
         checkWaitingList(userList, waitingForTarget, io);
@@ -94,7 +52,7 @@ module.exports = function(io) {
     //Remove the user from the list of users
     socket.on("disconnect", () => {
       //Remove User from userlist
-      removeUser(addedUser, socket);
+      waitingForTarget = removeUser(addedUser, socket, io, userList, waitingForTarget);
 
       //Check if any of the names was a targeted user
       //Replace any found with a new target
