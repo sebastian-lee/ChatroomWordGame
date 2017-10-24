@@ -29,6 +29,7 @@ module.exports = function(io) {
     //New user connection
     //keep track if this user has been added
     let addedUser = false;
+    
     /*
      * Add the new user to the list of users
      * with a unique name 

@@ -17,6 +17,7 @@ const Grid = styled.div`
   grid-template: repeat(4, 1fr) 0.3fr / repeat(5, 20%);
   height: 100vh;
   border: 1px solid black;
+  filter: blur(${props => (props.blur ? "5px" : "0px")});
 `;
 
 /*
@@ -35,9 +36,8 @@ const SideSection = styled.div`
   grid-column: 5/6;
   grid-row: 1/5;
   border: 1px solid black;
-
   display: grid;
-  grid-template-row: 1fr 1fr;
+  grid-template-row: 50% 50%;
 `;
 
 const UserListSection = styled.div`grid-row: 1;`;
@@ -54,11 +54,25 @@ const InputSection = styled.div`
 `;
 
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      blur: true
+    };
+
+    this.componentDidMount = this.componentDidMount.bind(this);
+  }
+
+  componentDidMount() {
+    socket.on("logged in", success => this.setState(() => ({ blur: false })));
+  }
+
   render() {
     return (
       <div className="App">
         <Login socket={socket} />
-        <Grid>
+        <Grid blur={this.state.blur}>
           <MessageSection>
             <MessageFeed socket={socket} />
           </MessageSection>

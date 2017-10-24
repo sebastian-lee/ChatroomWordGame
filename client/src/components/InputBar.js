@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
-
 //Adding styling to change if its the username submission or messaging bar
 const StyledForm = styled.form`
   height: 100%;
@@ -23,9 +22,19 @@ const StyledButton = styled.button`
 
 function InputBar(props) {
   return (
-    <StyledForm SendMessage={props.SendMessage} id={props.formID} onSubmit={props.onSubmit}>
-      <StyledInput SendMessage={props.SendMessage} id={props.inputID} autoComplete="off" />
-      <StyledButton SendMessage={props.SendMessage} id={props.StyledButtonID}>{props.buttonText}</StyledButton>
+    <StyledForm
+      SendMessage={props.SendMessage}
+      id={props.formID}
+      onSubmit={props.onSubmit}
+    >
+      <StyledInput
+        SendMessage={props.SendMessage}
+        id={props.inputID}
+        autoComplete="off"
+      />
+      <StyledButton SendMessage={props.SendMessage} id={props.StyledButtonID}>
+        {props.buttonText}
+      </StyledButton>
     </StyledForm>
   );
 }

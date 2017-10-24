@@ -16,6 +16,7 @@ const LoginScreen = styled.div`
 const LoginSection = styled.div`
   text-align: center;
   grid-row: 2;
+  z-index: 1;
 `;
 
 class Login extends Component {
@@ -46,8 +47,9 @@ class Login extends Component {
       this.setState(() => ({ loggedIn: success }))
     );
 
-    this.props.socket.on("not unique username", () =>{
-        document.getElementById("loginHeader").textContent = "Username taken, try another one";
+    this.props.socket.on("not unique username", () => {
+      document.getElementById("loginHeader").textContent =
+        "Username taken, try another one";
     });
   }
 
@@ -56,12 +58,14 @@ class Login extends Component {
       <LoginScreen loggedIn={this.state.loggedIn} id="loginScreen">
         <LoginSection>
           <h1 id="loginHeader">Enter a username</h1>
-          <InputBar
-            formID="usernameForm"
-            inputID="username"
-            buttonText="Enter Username"
-            onSubmit={this.handleUsernameSubmit}
-          />
+          <div>
+            <InputBar
+              formID="usernameForm"
+              inputID="username"
+              buttonText="Enter Username"
+              onSubmit={this.handleUsernameSubmit}
+            />
+          </div>
         </LoginSection>
       </LoginScreen>
     );

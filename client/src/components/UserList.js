@@ -16,6 +16,10 @@ const Users = styled.ul`
   grid-row: 2;
   border: 1px solid rgba(10, 10, 10, 0.2);
   list-style-type: none;
+  height: 200px;
+  overflow: hidden;
+  overflow-y: scroll;
+  margin: 0 10px 0 10px;
 `;
 
 class UserList extends Component {
@@ -34,14 +38,11 @@ class UserList extends Component {
       this.setState(() => ({ userScoreList: userScoreList }))
     );
 
-    this.props.socket.on("update score", (username, score) =>{
+    this.props.socket.on("update score", (username, score) => {
       let newScore = this.state.userScoreList;
       newScore[username] = score;
-      this.setState(() => (
-        {userScorelist : newScore}
-      ))
-    }
-    );
+      this.setState(() => ({ userScorelist: newScore }));
+    });
   }
 
   render() {
@@ -53,7 +54,9 @@ class UserList extends Component {
     return (
       <UserListContainer>
         <UserListHeader>User List</UserListHeader>
-        <Users className="userlist">{list.map(user => <li>{user}</li>)}</Users>
+        <Users className="userlist">
+          {list.map((user, index) => <li key={index}>{user}</li>)}
+        </Users>
       </UserListContainer>
     );
   }
