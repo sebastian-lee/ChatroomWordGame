@@ -20,6 +20,10 @@ const Users = styled.ul`
   overflow: hidden;
   overflow-y: scroll;
   margin: 0 10px 0 10px;
+
+  @media (max-height: 500px) {
+    height: 100px;
+	}
 `;
 
 class UserList extends Component {

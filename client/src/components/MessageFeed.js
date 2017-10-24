@@ -27,11 +27,10 @@ const Typing = styled.ul`
   flex-direction: row;
   grid-row: 2;
   align-items: center;
-`;
-
-const Message = styled.li`
   word-wrap: break-word;
 `;
+
+const Message = styled.li`word-wrap: break-word;`;
 
 class MessageFeed extends Component {
   constructor(props) {
@@ -39,21 +38,20 @@ class MessageFeed extends Component {
 
     this.state = {
       messages: []
-    }
+    };
 
     this.componentDidMount = this.componentDidMount.bind(this);
   }
 
-  appendNewMessage(msg){
+  appendNewMessage(msg) {
     var messages = this.state.messages;
-    if(messages.length>=100){
-      messages.splice(0,1);
+    if (messages.length >= 100) {
+      messages.splice(0, 1);
     }
     messages.push(msg);
     this.forceUpdate();
     var messages = document.querySelector("#messages");
     messages.scrollTop = messages.scrollHeight - messages.clientHeight;
-    
   }
 
   componentDidMount() {
@@ -96,7 +94,7 @@ class MessageFeed extends Component {
     return (
       <MessageContainer>
         <Messages id="messages">
-          {this.state.messages.map((message)=><Message>{message}</Message>)}
+          {this.state.messages.map(message => <Message>{message}</Message>)}
         </Messages>
         <Typing id="typing" />
       </MessageContainer>
