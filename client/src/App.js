@@ -16,8 +16,8 @@ const Grid = styled.div`
   display: grid;
   grid-template: repeat(4, 1fr) 0.3fr / repeat(5, 20%);
   height: 100vh;
-  border: 1px solid black;
   filter: blur(${props => (props.blur ? "5px" : "0px")});
+  transition: 0.3s;
 `;
 
 /*
@@ -26,8 +26,6 @@ const Grid = styled.div`
 const MessageSection = styled.div`
   grid-column: 1/5;
   grid-row: 1/5;
-  border: 1px solid black;
-
   @media (max-width: 600px) {
     grid-column: 1/6;
 	}
@@ -42,13 +40,12 @@ const MessageSection = styled.div`
 const SideSection = styled.div`
   grid-column: 5/6;
   grid-row: 1/5;
-  border: 1px solid black;
   display: grid;
   grid-template-rows: 70% 30%;
   width: 100%;
   z-index:0;
   transition: 0.5s;
-
+  border-left: 2px solid rgba(113, 0, 176, 0.5);
   @media (max-width: 600px) {
     opacity:${props => (props.sideOut ? "100" : "0")};
     width:${props => (props.sideOut ? "50%" : "0")};
@@ -66,7 +63,7 @@ const SidebarButton = styled.button`
   right:0;
   z-index:5;
   display: none;
-
+  
   @media (max-width: 600px) {
     display: block;
 	}
@@ -82,7 +79,7 @@ const TargetSection = styled.div`grid-row: 2;`;
 const InputSection = styled.div`
   grid-column: 1/6;
   grid-row: 5/6;
-  border: 1px solid black;
+  border-top: 2px solid rgba(113, 0, 176, 0.5);
 `;
 
 export default class App extends Component {

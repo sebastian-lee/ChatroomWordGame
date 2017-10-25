@@ -17,10 +17,18 @@ class Targets extends Component {
         "#targetUser"
       ).textContent = `Target User: ${targetUser}`;
     });
+
+    //list self's username
+    this.props.socket.on("my username", function(username) {
+      document.querySelector(
+        "#myUsername"
+      ).textContent = `${username}`;
+    });
   }
   render() {
     return (
       <div>
+        <p id="myUsername">Your Username</p>
         <p id="targetWord">Target Word:</p>
         <p id="targetUser">Target User:</p>
       </div>

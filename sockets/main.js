@@ -5,7 +5,7 @@ var getRandomTargetWord = require("./util/random.js").getRandomTargetWord;
 //Import from Updates
 var sendTargetUser = require("./updates/update.js").sendTargetUser;
 var sendTargetWord = require("./updates/update.js").sendTargetWord;
-var sendUserList = require("./updates/update.js").sendUserList; 
+var sendUserList = require("./updates/update.js").sendUserList;
 
 //Import from Checks
 var checkWaitingList = require("./checks/check.js").checkWaitingList;
@@ -39,12 +39,13 @@ module.exports = function(io) {
       //Sanitize username
       username = String(username);
       console.log("new username " + username);
+      
       if (addUser(addedUser, socket, io, username, userList, waitingForTarget)) {
         addedUser = true;
         //Check if anyone is on the waiting list and give them a target
         checkWaitingList(userList, waitingForTarget, io);
         socket.emit("logged in", true);
-        
+        socket.emit("my username", username);
         //send updated userlist
         sendUserList(io, userList);
       }
@@ -86,7 +87,12 @@ module.exports = function(io) {
       if (addedUser) {
         checkForTargetWord(msg, socket, userList, waitingForTarget, io);
         //Emit message to chatroom
-        io.emit("chat message", {
+        socket.broadcast.emit("chat message", {
+          username: userList.users[socket.id].username,
+          msg
+        });
+
+        socket.emit("self message", {
           username: userList.users[socket.id].username,
           msg
         });
@@ -94,13 +100,17 @@ module.exports = function(io) {
     });
 
     socket.on("typing", function() {
-      let username = userList.users[socket.id].username;
-      io.emit("typing", username);
+      if(userList.users[socket.id]){
+        let username = userList.users[socket.id].username;
+        io.emit("typing", username);
+      }
     });
 
     socket.on("stop typing", function() {
-      let username = userList.users[socket.id].username;
-      io.emit("stop typing", username);
+      if(userList.users[socket.id]){
+        let username = userList.users[socket.id].username;
+        io.emit("stop typing", username);
+      }
     });
 
     socket.on("error", function(err) {

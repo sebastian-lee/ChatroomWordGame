@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import InputBar from "./InputBar";
 
+//Main: 113, 0, 176 purple
+//Secondary: 255, 211, 0 yellow
+
 //Login Section
 const LoginScreen = styled.div`
   height: 100vh;
@@ -11,12 +14,48 @@ const LoginScreen = styled.div`
   background: rgba(10, 10, 10, 0.2);
   display: ${props => (props.loggedIn ? "none" : "grid")};
   grid-template-row: 1fr 1fr 1fr;
+  color: rgba(250,250,250,1);
+  text-shadow: 0px 1px 1px rgba(10,10,10, 0.8);
 `;
 
 const LoginSection = styled.div`
   text-align: center;
+  height: 300px;
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
   grid-row: 2;
   z-index: 1;
+  display: grid;
+  grid-template-row: 1fr 1fr 1fr 1fr;
+  background: rgba(113, 0, 176, 0.5);
+  border-radius: 15px;
+  padding: 15px;
+
+  p {
+    margin: 0;
+  }
+`;
+
+const Header = styled.h1`
+  font-size: 2.5em;
+  grid-row: 1;
+  border-radius: 15px;
+  padding: 5px;
+  border: 5px solid rgba(250,250,250,1);
+  text-shadow: rgba(113, 0, 176, 0.8);
+`;
+
+const InputSection = styled.div`
+  grid-row: 4;
+
+  h2 {
+    margin: 5px 0 5px 0;
+  }
+`;
+
+const LoginBar = styled(InputBar)`
+  height: 35px;
 `;
 
 class Login extends Component {
@@ -57,15 +96,18 @@ class Login extends Component {
     return (
       <LoginScreen loggedIn={this.state.loggedIn} id="loginScreen">
         <LoginSection>
-          <h1 id="loginHeader">Enter a username</h1>
-          <div>
-            <InputBar
+          <Header>Chatroom Word Game</Header>
+          <p>Convince your target to say your target word!</p>
+          <InputSection>
+            <h2 id="loginHeader">Enter a username</h2>
+            <LoginBar
+              login = {true}
               formID="usernameForm"
               inputID="username"
-              buttonText="Enter Username"
+              buttonText="send"
               onSubmit={this.handleUsernameSubmit}
             />
-          </div>
+          </InputSection>
         </LoginSection>
       </LoginScreen>
     );

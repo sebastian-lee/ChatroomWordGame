@@ -9,7 +9,7 @@ class SendMessagesBar extends Component {
 
     this.state = {
       typing: false
-    }
+    };
 
     this.handleSendMessage = this.handleSendMessage.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -17,48 +17,46 @@ class SendMessagesBar extends Component {
 
   handleSendMessage(e) {
     e.preventDefault();
-
     var m = document.querySelector("#m");
-    this.props.socket.emit("chat message", m.value);
-    
-    if(this.state.typing){
-      this.props.socket.emit("stop typing");
-      this.setState(()=>({typing:false}));
+    if (m.value != "") {
+      this.props.socket.emit("chat message", m.value);
+
+      if (this.state.typing) {
+        this.props.socket.emit("stop typing");
+        this.setState(() => ({ typing: false }));
+      }
+      m.value = "";
     }
-    m.value = "";
-    return false;
   }
 
-  componentDidMount(){
+  componentDidMount() {
     //Check if user is typing
     var input = document.getElementById("m");
     const TYPING_TIMER_LENGTH = 400;
     var lastTypingTime;
 
-    input.addEventListener("input",()=>{
-      if(!this.state.typing){
+    input.addEventListener("input", () => {
+      if (!this.state.typing) {
         this.props.socket.emit("typing");
-        this.setState(()=>({typing:true}));
+        this.setState(() => ({ typing: true }));
       }
-      
-      lastTypingTime = (new Date()).getTime();
-      
-      setTimeout(()=>{
-        var typingTimer = (new Date()).getTime();
+
+      lastTypingTime = new Date().getTime();
+
+      setTimeout(() => {
+        var typingTimer = new Date().getTime();
         var timeDiff = typingTimer - lastTypingTime;
         if (timeDiff >= TYPING_TIMER_LENGTH && this.state.typing) {
-          this.props.socket.emit('stop typing');
-          this.setState(()=>({typing:false}));
+          this.props.socket.emit("stop typing");
+          this.setState(() => ({ typing: false }));
         }
       }, TYPING_TIMER_LENGTH);
     });
-
   }
 
   render() {
     return (
       <InputBar
-        SendMessage={true}
         formID="messaging"
         inputID="m"
         buttonText="Send"

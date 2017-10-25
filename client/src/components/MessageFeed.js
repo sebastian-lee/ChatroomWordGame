@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
+
+//Main: 113, 0, 176 purple
+//Secondary: 255, 211, 0 yellow
 
 const MESSAGE_LIMIT = 100;
 
@@ -19,7 +22,7 @@ const Messages = styled.ul`
   grid-row: 1;
 `;
 
-const Typing = styled.ul`
+const TypingList = styled.ul`
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -30,25 +33,83 @@ const Typing = styled.ul`
   word-wrap: break-word;
 `;
 
-const Message = styled.li`word-wrap: break-word;`;
+const popUp = keyframes`
+from {
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+to {
+  opacity: 1;
+  transform: translateY(0px);
+}
+`;
+
+const Typing = styled.li`
+  animation: ${popUp} 0.1s linear;
+  margin: 5px;
+  color: rgba(10, 10, 10, 0.5);
+`;
+
+const Message = styled.li`
+  word-wrap: break-word;
+  margin: 25px 5px 25px 5px;
+  ${props => (props.type == "self" ? "text-align:right;" : "")};
+
+  p {
+    display: inline;
+    padding: 10px;
+    color: rgba(250, 250, 250, 1);
+    background: rgba(113, 0, 176, 0.7);
+    border-radius: 12px;
+
+    ${props => {
+      switch (props.type) {
+        case "chat":
+          return `
+          color: rgba(10, 10, 10, 1);
+          background: rgba(10, 10, 10, 0.1);`;
+        case "self":
+          return `background: rgba(113, 0, 176, 0.7);`;
+        case "connected":
+          return `
+            color: rgba(130, 180, 130, 1);
+            font-size: 1.1em;
+            font-weight: bold;
+            background: none;
+          `;
+        case "disconnected":
+          return `
+            color: rgba(180, 130, 130, 1);
+            font-size: 1.1em;
+            font-weight: bold;
+            background: none;
+          `;
+        default:
+          return "background: rgba(113, 0, 176, 0.7);";
+      }
+    }};
+  }
+`;
 
 class MessageFeed extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      messages: []
+      messages: [],
+      typingList: []
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
   }
 
-  appendNewMessage(msg) {
-    var messages = this.state.messages;
-    if (messages.length >= 100) {
-      messages.splice(0, 1);
+  appendNewMessage(type, msg) {
+    var messageList = this.state.messages;
+    if (messageList.length >= MESSAGE_LIMIT) {
+      messageList.splice(0, 1);
     }
-    messages.push(msg);
+    messageList.push([type, msg]);
     this.forceUpdate();
     var messages = document.querySelector("#messages");
     messages.scrollTop = messages.scrollHeight - messages.clientHeight;
@@ -57,26 +118,29 @@ class MessageFeed extends Component {
   componentDidMount() {
     //Append newly recieved messages to list
     this.props.socket.on("chat message", msg => {
-      this.appendNewMessage(`${msg.username}: ${msg.msg}`);
+      this.appendNewMessage("chat", `${msg.username}: ${msg.msg}`);
+    });
+
+    //Append Self message
+    this.props.socket.on("self message", msg => {
+      this.appendNewMessage("self", `${msg.username}: ${msg.msg}`);
     });
 
     //Notify that a user has joined the server
     this.props.socket.on("user connected", username => {
-      this.appendNewMessage(`${username} has joined`);
+      this.appendNewMessage("connected", `${username} has joined`);
     });
 
     //Notify that a user has left the server
     this.props.socket.on("user disconnected", username => {
-      this.appendNewMessage(`${username} has left`);
+      this.appendNewMessage("disconnected", `${username} has left`);
     });
 
     //Someone is typing in chat.
-    this.props.socket.on("typing", function(username) {
-      var isTyping = document.createElement("li");
-      isTyping.textContent = `${username} is typing...`;
-      isTyping.id = username;
-      var typing = document.querySelector("#typing");
-      typing.append(isTyping);
+    this.props.socket.on("typing", username => {
+      var typingList = this.state.typingList;
+      typingList.push(username);
+      this.forceUpdate();
     });
 
     //Someone stop typing in chat.
@@ -94,9 +158,17 @@ class MessageFeed extends Component {
     return (
       <MessageContainer>
         <Messages id="messages">
-          {this.state.messages.map(message => <Message>{message}</Message>)}
+          {this.state.messages.map(message => (
+            <Message type={message[0]}>
+              <p>{message[1]}</p>
+            </Message>
+          ))}
         </Messages>
-        <Typing id="typing" />
+        <TypingList id="typing">
+          {this.state.typingList.map(username => (
+            <Typing id={username}>{username} is typing...</Typing>
+          ))}
+        </TypingList>
       </MessageContainer>
     );
   }
