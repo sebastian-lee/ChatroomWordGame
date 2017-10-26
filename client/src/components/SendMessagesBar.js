@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
 import InputBar from "./InputBar";
 
 class SendMessagesBar extends Component {
@@ -59,7 +58,6 @@ class SendMessagesBar extends Component {
       <InputBar
         formID="messaging"
         inputID="m"
-        buttonText="Send"
         onSubmit={this.handleSendMessage}
       />
     );

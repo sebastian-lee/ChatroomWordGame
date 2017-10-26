@@ -11,6 +11,7 @@ const MessageContainer = styled.div`
   height: 100%;
   display: grid;
   grid-template-rows: 90% 10%;
+  background-color: rgba(245,245,245,1);
 `;
 
 const Messages = styled.ul`
@@ -147,7 +148,7 @@ class MessageFeed extends Component {
     this.props.socket.on("stop typing", function(username) {
       var typing = document.querySelector("#typing");
       for (let i = 0; i < typing.children.length; i++) {
-        if (typing.children[i].id == username) {
+        if (typing.children[i].id == `${username}Typing`) {
           typing.removeChild(typing.children[i]);
         }
       }
@@ -158,15 +159,15 @@ class MessageFeed extends Component {
     return (
       <MessageContainer>
         <Messages id="messages">
-          {this.state.messages.map(message => (
-            <Message type={message[0]}>
+          {this.state.messages.map((message,index) => (
+            <Message key={index} type={message[0]}>
               <p>{message[1]}</p>
             </Message>
           ))}
         </Messages>
         <TypingList id="typing">
-          {this.state.typingList.map(username => (
-            <Typing id={username}>{username} is typing...</Typing>
+          {this.state.typingList.map((username,index) => (
+            <Typing key={index} id={`${username}Typing`}>{username} is typing...</Typing>
           ))}
         </TypingList>
       </MessageContainer>

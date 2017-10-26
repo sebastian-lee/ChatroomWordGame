@@ -8,6 +8,7 @@ import MessageFeed from "./components/MessageFeed";
 import UserList from "./components/UserList";
 import Targets from "./components/Targets";
 import SendMessagesBar from "./components/SendMessagesBar";
+import MenuButton from "./components/MenuButton";
 
 const socket = io();
 
@@ -18,6 +19,7 @@ const Grid = styled.div`
   height: 100vh;
   filter: blur(${props => (props.blur ? "5px" : "0px")});
   transition: 0.3s;
+  overflow-x: hidden;
 `;
 
 /*
@@ -39,13 +41,13 @@ const MessageSection = styled.div`
  */
 const SideSection = styled.div`
   grid-column: 5/6;
-  grid-row: 1/5;
+  grid-row: 1/6;
   display: grid;
   grid-template-rows: 70% 30%;
   width: 100%;
   z-index:0;
   transition: 0.5s;
-  border-left: 2px solid rgba(113, 0, 176, 0.5);
+  border-left: 2px solid rgba(113, 0, 176, 0.7);
   @media (max-width: 600px) {
     opacity:${props => (props.sideOut ? "100" : "0")};
     width:${props => (props.sideOut ? "50%" : "0")};
@@ -54,19 +56,25 @@ const SideSection = styled.div`
     right: 0;
     z-index:1;
     overflow-x: hidden; 
-	}
+  }
+  @media (max-height: 500px){
+    grid-template-rows: 50% 50%;
+  }
 `;
 
-const SidebarButton = styled.button`
-  position: fixed;
-  top:0;
-  right:0;
-  z-index:5;
+const SidebarButton = styled.div`
+  top: 0;
+  right: 0;
+  z-index: 5;
   display: none;
-  
+  padding-right:5px;
+  position:absolute;
+  transition: 0.5s;
+
   @media (max-width: 600px) {
     display: block;
-	}
+    margin-right:${props => (props.sideOut ? "50%" : "0")};
+  }
 `;
 
 const UserListSection = styled.div`grid-row: 1;`;
@@ -77,9 +85,13 @@ const TargetSection = styled.div`grid-row: 2;`;
  * Input Section
  */
 const InputSection = styled.div`
-  grid-column: 1/6;
+  grid-column: 1/5;
   grid-row: 5/6;
-  border-top: 2px solid rgba(113, 0, 176, 0.5);
+  border-top: 2px solid rgba(113, 0, 176, 0.7);
+
+  @media (max-width: 600px) {
+    grid-column: 1/6;
+	}
 `;
 
 export default class App extends Component {
@@ -104,6 +116,7 @@ export default class App extends Component {
   }
 
   render() {
+    let sideOut = this.state.sideOut;
     return (
       <div className="App">
         <Login socket={socket} />
@@ -112,8 +125,10 @@ export default class App extends Component {
             <MessageFeed socket={socket} />
           </MessageSection>
 
-          <SidebarButton onClick={this.toggleSideBar}>X</SidebarButton>
-          <SideSection sideOut={this.state.sideOut}>
+          <SidebarButton sideOut={sideOut}>
+            <MenuButton onClick={this.toggleSideBar} change={sideOut}/>
+          </SidebarButton>
+          <SideSection sideOut={sideOut}>
             <UserListSection>
               <UserList socket={socket} />
             </UserListSection>

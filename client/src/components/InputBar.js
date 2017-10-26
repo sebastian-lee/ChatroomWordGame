@@ -10,7 +10,6 @@ const StyledForm = styled.form`
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template: ${props => (props.login ? "1fr / 1fr" : "1fr / 4fr 1fr")};
 `;
 
 const StyledInput = styled.input`
@@ -20,12 +19,13 @@ const StyledInput = styled.input`
   border-radius: ${props => (props.login ? "15px" : "0px")};
   padding: 5px;
   transition: 0.5s;
-
+  color: rgba(10,10,10,0.8);
+  background-color: rgba(245,245,245,1);
   &:focus {
     outline: none;
     border: 2px solid rgba(179, 46, 252, 0.3);
     border-style: inset;
-    ${props => (props.login ? "translateY(-2px)" : "")};
+    ${props => (props.login ? "transform: translateY(-2px)" : "")};
     ${props => (props.login ? "box-shadow: 0px 2px 2px rgba(10,10,10,0.3);" : "")};
   }
 
@@ -33,16 +33,6 @@ const StyledInput = styled.input`
     outline: none;
     border: 2px solid rgba(179, 46, 252, 0.5);
     border-style: inset;
-  }
-`;
-
-const StyledButton = styled.button`
-  grid-column: 2;
-  border: none;
-  ${props => (props.login ? "display:none" : "")};
-
-  &:focus {
-    outline: none;
   }
 `;
 
@@ -55,9 +45,6 @@ function InputBar(props) {
       onSubmit={props.onSubmit}
     >
       <StyledInput login={props.login} id={props.inputID} autoComplete="off" />
-      <StyledButton login={props.login} id={props.StyledButtonID}>
-        {props.buttonText}
-      </StyledButton>
     </StyledForm>
   );
 }
@@ -65,8 +52,6 @@ function InputBar(props) {
 InputBar.propTypes = {
   formID: PropTypes.string,
   inputID: PropTypes.string,
-  buttonID: PropTypes.string,
-  buttonText: PropTypes.string,
   onSubmit: PropTypes.func.isRequired
 };
 

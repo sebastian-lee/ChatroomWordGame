@@ -35,6 +35,15 @@ const LoginSection = styled.div`
   p {
     margin: 0;
   }
+
+  @media (max-width: 600px) {
+    width:80%;
+    padding:15px;
+    
+    p{
+      font-size: 1.5em;
+    }
+  }
 `;
 
 const Header = styled.h1`
@@ -103,8 +112,7 @@ class Login extends Component {
             <LoginBar
               login = {true}
               formID="usernameForm"
-              inputID="username"
-              buttonText="send"
+              inputID="username"            
               onSubmit={this.handleUsernameSubmit}
             />
           </InputSection>
