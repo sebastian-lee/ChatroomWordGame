@@ -3,14 +3,19 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 const TargetsContainer = styled.div`
-  background: rgba(113, 0, 176, 0.7);
+  background: rgb(153, 84, 196);
   height: 100%;
   color: rgb(250, 250, 250);
+  display:flex;
 `;
 
 const TargetItems = styled.p`
   padding: 5px;
   margin: 10px 0 10px 0;
+
+  @media (max-height: 500px){
+    margin: 2.5px 0 2.5px 0;
+  }
 `;
 
 const Username = TargetItems.extend`
@@ -19,10 +24,16 @@ const Username = TargetItems.extend`
 `;
 
 const TargetBackground = styled.div`
-  padding: 15px;
+  padding: 5px;
+  width:100%;
   background: rgba(10,10,10,0.2);
   border-radius: 5px;
-  margin: 0 10px 10px 10px;
+  margin: 0 10px 0 10px;
+  align-self: center;
+
+  @media (max-height: 500px){
+    padding:5px;
+  }
 `; 
 
 class Targets extends Component {

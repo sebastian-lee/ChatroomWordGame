@@ -30,7 +30,7 @@ const MessageSection = styled.div`
   grid-row: 1/5;
   @media (max-width: 600px) {
     grid-column: 1/6;
-	}
+  }
 `;
 
 /*
@@ -45,20 +45,20 @@ const SideSection = styled.div`
   display: grid;
   grid-template-rows: 70% 30%;
   width: 100%;
-  z-index:0;
+  z-index: 0;
   transition: 0.5s;
   border-left: 2px solid rgba(113, 0, 176, 0.7);
   @media (max-width: 600px) {
-    opacity:${props => (props.sideOut ? "100" : "0")};
-    width:${props => (props.sideOut ? "50%" : "0")};
+    opacity: ${props => (props.sideOut ? "100" : "0")};
+    width: ${props => (props.sideOut ? "50%" : "0")};
     position: absolute;
-    height: 100%;
+    height: 100vh;
     right: 0;
-    z-index:1;
-    overflow-x: hidden; 
+    z-index: 1;
+    overflow-x: hidden;
   }
-  @media (max-height: 500px){
-    grid-template-rows: 50% 50%;
+  @media (max-height: 500px) {
+    grid-template-rows: 40% 60%;
   }
 `;
 
@@ -67,19 +67,23 @@ const SidebarButton = styled.div`
   right: 0;
   z-index: 5;
   display: none;
-  padding-right:5px;
-  position:absolute;
+  padding-right: 5px;
+  position: absolute;
   transition: 0.5s;
 
   @media (max-width: 600px) {
     display: block;
-    margin-right:${props => (props.sideOut ? "50%" : "0")};
+    margin-right: ${props => (props.sideOut ? "50%" : "0")};
   }
 `;
 
-const UserListSection = styled.div`grid-row: 1;`;
+const UserListSection = styled.div`
+  grid-row: 1;
+`;
 
-const TargetSection = styled.div`grid-row: 2;`;
+const TargetSection = styled.div`
+  grid-row: 2;
+`;
 
 /*
  * Input Section
@@ -91,7 +95,7 @@ const InputSection = styled.div`
 
   @media (max-width: 600px) {
     grid-column: 1/6;
-	}
+  }
 `;
 
 export default class App extends Component {
@@ -100,7 +104,7 @@ export default class App extends Component {
 
     this.state = {
       blur: true,
-      sideOut: false,
+      sideOut: false
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -111,8 +115,8 @@ export default class App extends Component {
     socket.on("logged in", success => this.setState(() => ({ blur: false })));
   }
 
-  toggleSideBar(){
-    this.setState(()=>({sideOut: !this.state.sideOut}));
+  toggleSideBar() {
+    this.setState(() => ({ sideOut: !this.state.sideOut }));
   }
 
   render() {
@@ -126,7 +130,7 @@ export default class App extends Component {
           </MessageSection>
 
           <SidebarButton sideOut={sideOut}>
-            <MenuButton onClick={this.toggleSideBar} change={sideOut}/>
+            <MenuButton onClick={this.toggleSideBar} change={sideOut} />
           </SidebarButton>
           <SideSection sideOut={sideOut}>
             <UserListSection>

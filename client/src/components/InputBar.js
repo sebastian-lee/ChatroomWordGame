@@ -21,6 +21,8 @@ const StyledInput = styled.input`
   transition: 0.5s;
   color: rgba(10,10,10,0.8);
   background-color: rgba(245,245,245,1);
+  width:100%;
+  
   &:focus {
     outline: none;
     border: 2px solid rgba(179, 46, 252, 0.3);

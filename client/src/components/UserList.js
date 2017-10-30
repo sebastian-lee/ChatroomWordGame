@@ -5,18 +5,22 @@ import '../utils/animation.css';
 
 //Main: 113, 0, 176 purple
 //Secondary: 255, 211, 0 yellow
+//Light purple: 153 84 196
 
 const UserListContainer = styled.div`
   height: 100%;
   display: grid;
   grid-template: 1fr 5fr/1fr;
-  background: rgba(113, 0, 176, 0.7);
+  background: rgb(153, 84, 196);
   color: rgba(250, 250, 250, 1);
 `;
 
 const UserListHeader = styled.h1`
   grid-row: 1;
   text-align: center;
+  @media (max-height: 500px) {
+    font-size:1em;
+  }
 `;
 const Scoreboard = styled.div`
   grid-row: 2;
@@ -34,6 +38,10 @@ const Scoreboard = styled.div`
 
   @media (max-height: 500px) {
     height: 100px;
+  }
+
+  @media (min-height: 1000px) {
+    max-height: 800px;
   }
 `;
 

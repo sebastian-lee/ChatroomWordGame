@@ -14,8 +14,8 @@ const LoginScreen = styled.div`
   background: rgba(10, 10, 10, 0.2);
   display: ${props => (props.loggedIn ? "none" : "grid")};
   grid-template-row: 1fr 1fr 1fr;
-  color: rgba(250,250,250,1);
-  text-shadow: 0px 1px 1px rgba(10,10,10, 0.8);
+  color: rgba(250, 250, 250, 1);
+  text-shadow: 0px 1px 1px rgba(10, 10, 10, 0.8);
 `;
 
 const LoginSection = styled.div`
@@ -37,11 +37,12 @@ const LoginSection = styled.div`
   }
 
   @media (max-width: 600px) {
-    width:80%;
-    padding:15px;
-    
-    p{
-      font-size: 1.5em;
+    width: 80%;
+
+    padding: 15px;
+
+    p {
+      font-size: 1em;
     }
   }
 `;
@@ -51,7 +52,7 @@ const Header = styled.h1`
   grid-row: 1;
   border-radius: 15px;
   padding: 5px;
-  border: 5px solid rgba(250,250,250,1);
+  border: 5px solid rgba(250, 250, 250, 1);
   text-shadow: rgba(113, 0, 176, 0.8);
 `;
 
@@ -65,6 +66,9 @@ const InputSection = styled.div`
 
 const LoginBar = styled(InputBar)`
   height: 35px;
+  width:80%;
+  margin-left:auto;
+  margin-right:auto;
 `;
 
 class Login extends Component {
@@ -110,9 +114,9 @@ class Login extends Component {
           <InputSection>
             <h2 id="loginHeader">Enter a username</h2>
             <LoginBar
-              login = {true}
+              login={true}
               formID="usernameForm"
-              inputID="username"            
+              inputID="username"
               onSubmit={this.handleUsernameSubmit}
             />
           </InputSection>
