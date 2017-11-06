@@ -45,9 +45,38 @@ function getRandomTargetWord(lastWord = null) {
   return newWord;
 }
 
+function getRandomRoles(userList) {
+  let roles = ["spy", "spy", "detective", "detective", "liar"];
+
+  for (user in userList.users) {
+    if (roles.length == 0) return;
+    let randNum = getRandomInt(0, roles.length);
+    userList.users[user].role = roles[randNum];
+    roles = roles
+      .slice(0, randNum)
+      .concat(roles.slice(randNum + 1, roles.length));
+  }
+}
+
+const PASS_LENGTH = 6;
+
+function getRandomPassword(password) {
+  //push random words into the password array
+  let passwordArr = wordDatabase;
+  for (let i = 0; i < PASS_LENGTH; i++) {
+    let randNum = getRandomInt(0, passwordArr.length);
+    password.push(passwordArr[randNum]);
+    passwordArr = passwordArr
+      .slice(0, randNum)
+      .concat(passwordArr.slice(randNum + 1, passwordArr.length));
+  }
+}
+
 module.exports = {
   getRandomInt,
   getRandomUser,
   getRandomTargetUser,
-  getRandomTargetWord
+  getRandomTargetWord,
+  getRandomRoles,
+  getRandomPassword
 };

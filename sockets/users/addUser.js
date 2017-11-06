@@ -29,7 +29,9 @@ function addUser(addedUser, socket, io, username, userList, waitingForTarget) {
     targetWord: getRandomTargetWord(),
     //Pick a random user from list of clients, if no one else, put on waiting list for new players.
     targetUserID: getRandomTargetUser(socket.id, userList, waitingForTarget),
-    score: 0
+    score: 0,
+    role: "",
+    attempts: 0
   };
 
   //Send the target word and user to the client

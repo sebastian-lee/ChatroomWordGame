@@ -6,9 +6,11 @@ import styled from "styled-components";
 import Login from "./components/Login";
 import MessageFeed from "./components/MessageFeed";
 import UserList from "./components/UserList";
-import Targets from "./components/Targets";
+import Roles from "./components/Roles";
 import SendMessagesBar from "./components/SendMessagesBar";
 import MenuButton from "./components/MenuButton";
+import PasswordInput from "./components/PasswordInput";
+import AccuseInput from "./components/AccuseInput"
 
 const socket = io();
 
@@ -81,7 +83,7 @@ const UserListSection = styled.div`
   grid-row: 1;
 `;
 
-const TargetSection = styled.div`
+const RolesSection = styled.div`
   grid-row: 2;
 `;
 
@@ -104,7 +106,8 @@ export default class App extends Component {
 
     this.state = {
       blur: true,
-      sideOut: false
+      sideOut: false,
+      role: ""
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -112,7 +115,10 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    socket.on("logged in", success => this.setState(() => ({ blur: false })));
+    socket.on("logged in", success => this.setState(() => ({ blur: !success })));
+
+    //add your role
+    socket.on("my role", role => this.setState(() => ({ role: role })));
   }
 
   toggleSideBar() {
@@ -137,9 +143,11 @@ export default class App extends Component {
               <UserList socket={socket} />
             </UserListSection>
 
-            <TargetSection>
-              <Targets socket={socket} />
-            </TargetSection>
+            <RolesSection>
+              <Roles socket={socket} role={this.state.role}/>
+              <PasswordInput socket={socket} />
+              <AccuseInput socket={socket} />
+            </RolesSection>
           </SideSection>
 
           <InputSection>

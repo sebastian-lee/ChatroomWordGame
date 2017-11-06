@@ -58,7 +58,7 @@ function checkForTargetWord(msg, socket, userList, waitingForTarget, io) {
           waitingForTarget
         );
         userObj.targetWord = getRandomTargetWord(userObj.targetWord);
-        
+
         //Increment score and send
         userObj.score += 1;
         //sendUserList(io, userList);
@@ -72,8 +72,23 @@ function checkForTargetWord(msg, socket, userList, waitingForTarget, io) {
   }
 }
 
+function checkPassword(password, userList) {
+  let match = false;
+  //Checking password
+  if (password.length == userList.password.length) {
+    match = true;
+    password.map(val => {
+      if (!userList.password.includes(val)) {
+        match = false;
+      }
+    });
+  }
+  return match;
+}
+
 module.exports = {
   checkUniqueUsername,
   checkWaitingList,
-  checkForTargetWord
+  checkForTargetWord,
+  checkPassword
 };
