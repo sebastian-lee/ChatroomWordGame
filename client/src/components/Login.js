@@ -69,6 +69,10 @@ const LoginBar = styled(InputBar)`
   width:80%;
   margin-left:auto;
   margin-right:auto;
+  
+  input {
+    font-size: 1.5em;
+  }
 `;
 
 class Login extends Component {
@@ -114,7 +118,7 @@ class Login extends Component {
           <InputSection>
             <h2 id="loginHeader">Enter a username</h2>
             <LoginBar
-              login={true}
+              round={true}
               formID="usernameForm"
               inputID="username"
               onSubmit={this.handleUsernameSubmit}

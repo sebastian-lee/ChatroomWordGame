@@ -9,8 +9,7 @@ import UserList from "./components/UserList";
 import Roles from "./components/Roles";
 import SendMessagesBar from "./components/SendMessagesBar";
 import MenuButton from "./components/MenuButton";
-import PasswordInput from "./components/PasswordInput";
-import AccuseInput from "./components/AccuseInput"
+import AlertBar from "./components/AlertBar";
 
 const socket = io();
 
@@ -45,7 +44,7 @@ const SideSection = styled.div`
   grid-column: 5/6;
   grid-row: 1/6;
   display: grid;
-  grid-template-rows: 70% 30%;
+  grid-template-rows: 30% 70%;
   width: 100%;
   z-index: 0;
   transition: 0.5s;
@@ -79,13 +78,9 @@ const SidebarButton = styled.div`
   }
 `;
 
-const UserListSection = styled.div`
-  grid-row: 1;
-`;
+const UserListSection = styled.div`grid-row: 1;`;
 
-const RolesSection = styled.div`
-  grid-row: 2;
-`;
+const RolesSection = styled.div`grid-row: 2;`;
 
 /*
  * Input Section
@@ -99,6 +94,8 @@ const InputSection = styled.div`
     grid-column: 1/6;
   }
 `;
+
+
 
 export default class App extends Component {
   constructor(props) {
@@ -115,7 +112,9 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    socket.on("logged in", success => this.setState(() => ({ blur: !success })));
+    socket.on("logged in", success =>
+      this.setState(() => ({ blur: !success }))
+    );
 
     //add your role
     socket.on("my role", role => this.setState(() => ({ role: role })));
@@ -130,6 +129,7 @@ export default class App extends Component {
     return (
       <div className="App">
         <Login socket={socket} />
+        <AlertBar socket={socket} />
         <Grid blur={this.state.blur}>
           <MessageSection>
             <MessageFeed socket={socket} />
@@ -144,9 +144,7 @@ export default class App extends Component {
             </UserListSection>
 
             <RolesSection>
-              <Roles socket={socket} role={this.state.role}/>
-              <PasswordInput socket={socket} />
-              <AccuseInput socket={socket} />
+              <Roles socket={socket} role={this.state.role} />
             </RolesSection>
           </SideSection>
 

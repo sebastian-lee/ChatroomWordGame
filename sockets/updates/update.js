@@ -51,10 +51,27 @@ function sendHalfOfPass(io, userList, password) {
   io.to(spiesIDs[1]).emit("starting password", pass2);
 }
 
+function sendOtherSpies(io, userList) {
+  //Find the spies in userlist
+  let spiesIDs = [];
+
+  for (user in userList.users) {
+    let role = userList.users[user].role;
+    if (role == "spy") {
+      spiesIDs.push(user);
+    }
+  }
+
+  //Emit other spy info
+  io.to(spiesIDs[0]).emit("other spy", userList.users[spiesIDs[1]].username);
+  io.to(spiesIDs[1]).emit("other spy", userList.users[spiesIDs[0]].username);
+}
+
 module.exports = {
   sendTargetUser,
   sendTargetWord,
   sendUserList,
   sendScore,
-  sendHalfOfPass
+  sendHalfOfPass,
+  sendOtherSpies
 };

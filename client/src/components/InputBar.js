@@ -14,9 +14,8 @@ const StyledForm = styled.form`
 
 const StyledInput = styled.input`
   grid-column: 1;
-  font-size: 1.5em;
   border: 2px solid rgba(179, 46, 252, 0);
-  border-radius: ${props => (props.login ? "15px" : "0px")};
+  border-radius: ${props => (props.round ? "15px" : "0px")};
   padding: 5px;
   transition: 0.5s;
   color: rgba(10,10,10,0.8);
@@ -27,8 +26,8 @@ const StyledInput = styled.input`
     outline: none;
     border: 2px solid rgba(179, 46, 252, 0.3);
     border-style: inset;
-    ${props => (props.login ? "transform: translateY(-2px)" : "")};
-    ${props => (props.login ? "box-shadow: 0px 2px 2px rgba(10,10,10,0.3);" : "")};
+    ${props => (props.round ? "transform: translateY(-2px)" : "")};
+    ${props => (props.round ? "box-shadow: 0px 2px 2px rgba(10,10,10,0.3);" : "")};
   }
 
   &:hover {
@@ -41,12 +40,12 @@ const StyledInput = styled.input`
 function InputBar(props) {
   return (
     <StyledForm
-      login={props.login}
+      round={props.round}
       className={props.className}
       id={props.formID}
       onSubmit={props.onSubmit}
     >
-      <StyledInput login={props.login} id={props.inputID} autoComplete="off" />
+      <StyledInput round={props.round} id={props.inputID} autoComplete="off" />
     </StyledForm>
   );
 }

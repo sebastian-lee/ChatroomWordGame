@@ -9,6 +9,7 @@ var sendTargetUser = require("./updates/update.js").sendTargetUser;
 var sendTargetWord = require("./updates/update.js").sendTargetWord;
 var sendUserList = require("./updates/update.js").sendUserList;
 var sendHalfOfPass = require("./updates/update.js").sendHalfOfPass;
+var sendOtherSpies = require("./updates/update.js").sendOtherSpies;
 
 //Import from Checks
 var checkWaitingList = require("./checks/check.js").checkWaitingList;
@@ -20,6 +21,14 @@ var findLiar = require("./checks/find.js").findLiar;
 //Import from Users
 var addUser = require("./users/addUser.js");
 var removeUser = require("./users/removeUser.js");
+
+//Import from Init
+var applyRoleAttempts = require("./users/init.js").applyRoleAttempts;
+
+//Import from game
+var gameTimer = require("./util/game.js").gameTimer;
+var whoWon = require("./util/game.js").whoWon;
+var gameOver = require("./util/game.js").gameOver;
 
 //Player Count
 const REQUIRED_PLAYERS = 5;
@@ -43,6 +52,8 @@ module.exports = function(io) {
     users: {}
   };
 
+  var timer;
+
   //List of waiting socket ids
   var waitingForTarget = [];
 
@@ -55,31 +66,6 @@ module.exports = function(io) {
      * Add the new user to the list of users
      * with a unique name 
      */
-
-    function applyRoleAttempts(
-      userList,
-      detectiveAttempts,
-      spyAttempts,
-      liarAttempts
-    ) {
-      for (let user in userList.users) {
-        role = userList.users[user].role;
-        switch (role) {
-          case "detective":
-            userList.users[user].attempts = detectiveAttempts;
-            break;
-          case "spy":
-            userList.users[user].attempts = spyAttempts;
-            break;
-          case "liar":
-            userList.users[user].attempts = liarAttempts;
-            userList.users[user].whoGuessedMe = [];
-            break;
-          default:
-            console.log(`${role} is not a role`);
-        }
-      }
-    }
 
     socket.on("add username", function(username) {
       //Do not let more than the required amount join
@@ -98,14 +84,21 @@ module.exports = function(io) {
         addedUser = true;
         //Check if anyone is on the waiting list and give them a target
         checkWaitingList(userList, waitingForTarget, io);
+
+        //Update client that login successful
         socket.emit("logged in", true);
         socket.emit("my username", username);
+
         //send updated userlist
         sendUserList(io, userList);
 
         console.log(`There are ${userList.length} players.`);
         if (userList.length < REQUIRED_PLAYERS) {
           console.log("Waiting for more players to join");
+          io.emit("chat message", {
+            username: "SERVER",
+            msg: `Waiting for ${5-userList.length} more players to join`
+          });
         } else {
           //Start Game
           console.log(`There are enough players. Starting Game.`);
@@ -131,23 +124,11 @@ module.exports = function(io) {
           console.log(`Password is ${userList.password}`);
           //Send half of password to the two spies
           sendHalfOfPass(io, userList, userList.password);
+          //Send who the other spy is
+          sendOtherSpies(io, userList);
 
           //Start Timer
-          let startTime = Date.now();
-          let endTime = startTime + GAME_LENGTH * 60 * 1000;
-          let timer = setInterval(function() {
-            let now = Date.now();
-            let timeElasped = now - startTime;
-            let timeLeft = endTime - now;
-            if (now > endTime) {
-              console.log("Time is up.");
-              clearInterval(timer);
-            }
-
-            io.emit("time left", timeLeft);
-            //console.log("Time elasped (secs):" + (timeElasped/1000));
-            //console.log("Time left (secs):" + (timeLeft/1000));
-          }, 1000);
+          timer = gameTimer(io, GAME_LENGTH);
         }
       }
     });
@@ -225,18 +206,20 @@ module.exports = function(io) {
       console.log(password);
 
       let match = checkPassword(password, userList);
-      
+
       let attempts = --userList.users[socket.id].attempts;
       if (match) {
         console.log("Right! Spies win!");
         socket.emit("password result", match, attempts);
+        gameOver(io, whoWon(false, true, false), timer);
       } else {
         console.log("Wrong Pass");
         socket.emit("password result", match, attempts);
       }
 
-      if(userList.users[socket.id].attempts <= 0){
+      if (userList.users[socket.id].attempts <= 0) {
         console.log("GAME OVER: Spies loses");
+        gameOver(io, whoWon(true, false, true), timer);
       }
     });
 
@@ -263,13 +246,15 @@ module.exports = function(io) {
           for (user in userList.users) {
             let role = userList.users[user].role;
             if (role == "liar") {
-              if(!userList.users[user].whoGuessedMe.includes(socket)){
+              //Check if this detective has already guessed the liar.
+              if (!userList.users[user].whoGuessedMe.includes(socket)) {
                 userList.users[user].attempts--;
                 userList.users[user].whoGuessedMe.push(socket);
-                
+
                 //If all detectives have guess liars once
-                if(userList.users[user].attempts <= 0){
+                if (userList.users[user].attempts <= 0) {
                   console.log("LIAR WINS!");
+                  gameOver(io, whoWon(false, false, true), timer);
                 }
               }
             }
@@ -279,10 +264,16 @@ module.exports = function(io) {
 
       let attempts = --userList.users[socket.id].attempts;
       console.log(`Picked spies: ${match}`);
-      socket.emit("accused result", match, attempts);
-      
-      if(userList.users[socket.id].attempts <= 0){
+      if (match) {
+        console.log("Detectives win!");
+        gameOver(io, whoWon(true, false, false), timer);
+      } else {
+        console.log("Did not pick spies");
+        socket.emit("accused result", match, attempts);
+      }
+      if (userList.users[socket.id].attempts <= 0) {
         console.log("GAME OVER: Detectives loses");
+        gameOver(io, whoWon(false, true, true), timer);
       }
     });
 
