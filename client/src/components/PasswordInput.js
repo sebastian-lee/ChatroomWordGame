@@ -4,11 +4,16 @@ import styled from "styled-components";
 import InputBar from "./InputBar";
 import DeleteItem from "./DeleteItem";
 
-const PasswordBar = styled(InputBar)`width: 80%;`;
+const PasswordBar = styled(InputBar)`
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+`;
 
 const GuessedPassword = styled.ul`
   list-style: none;
-  padding: 0;
+  padding: 10px;
+  margin: 0;
 
   li {
     margin: 5px 0 5px 0;
@@ -30,6 +35,7 @@ const GuessedWord = styled.p`
 const CheckButton = styled.div`
   border-radius: 10px;
   padding: 5px 10px 5px 10px;
+  margin-left: 10px;
   background-color: rgba(245, 245, 245, 1);
   color: rgba(10, 10, 10, 0.8);
   width: fit-content;
@@ -49,6 +55,11 @@ const InitPass = styled.div`
   border-top: 2px solid rgba(10, 10, 10, 0.2);
   margin: 5px auto 5px auto;
   text-align: center;
+`;
+
+const PadText = styled.p`
+  margin: 0;
+  padding: 10px;
 `;
 
 class PasswordInput extends Component {
@@ -107,17 +118,17 @@ class PasswordInput extends Component {
     return (
       <div>
         <InitPass>
-          <p>Your half of the password:</p>
+          <PadText>Your half of the password:</PadText>
           {this.state.halfOfPass.map((keyWord, index) => (
             <p key={index}>{keyWord}</p>
           ))}
         </InitPass>
 
         <form onSubmit={this.handlePasswordAdd}>
-          Password:
+          <PadText>Password:</PadText>
           <PasswordBar round={true} inputID="password" />
         </form>
-        <p>Your guess</p>
+        <PadText>Your guess</PadText>
         <GuessedPassword>
           {this.state.password.map((keyWord, index) => (
             <li key={index}>
@@ -129,7 +140,7 @@ class PasswordInput extends Component {
 
         <CheckButton onClick={this.handlePasswordSend}>Check</CheckButton>
 
-        <p id="result">{this.state.result}</p>
+        <PadText id="result">{this.state.result}</PadText>
       </div>
     );
   }

@@ -1,9 +1,3 @@
-var sendTargetUser = require("../updates/update.js").sendTargetUser;
-var sendTargetWord = require("../updates/update.js").sendTargetWord;
-
-var getRandomTargetUser = require("../util/random.js").getRandomTargetUser;
-var getRandomTargetWord = require("../util/random.js").getRandomTargetWord;
-
 //Import from Checks
 var checkUniqueUsername = require("../checks/check.js").checkUniqueUsername;
 
@@ -25,21 +19,11 @@ function addUser(addedUser, socket, io, username, userList, waitingForTarget) {
 
   userList.users[socket.id] = {
     username: username,
-    //Give user a target word and target user
-    targetWord: getRandomTargetWord(),
-    //Pick a random user from list of clients, if no one else, put on waiting list for new players.
-    targetUserID: getRandomTargetUser(socket.id, userList, waitingForTarget),
     score: 0,
     role: "",
     attempts: 0
   };
 
-  //Send the target word and user to the client
-  sendTargetWord(socket.id, io, userList);
-  //If there is a target userID emit to client
-  if (userList.users[socket.id].targetUserID != null) {
-    sendTargetUser(socket.id, io, userList);
-  }
   return true;
 }
 

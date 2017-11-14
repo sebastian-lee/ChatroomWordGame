@@ -7,21 +7,20 @@ import styled from "styled-components";
 
 //Adding styling to change if its the username submission or messaging bar
 const StyledForm = styled.form`
-  width: 100%;
-  height: 100%;
-  display: grid;
 `;
 
 const StyledInput = styled.input`
-  grid-column: 1;
   border: 2px solid rgba(179, 46, 252, 0);
   border-radius: ${props => (props.round ? "15px" : "0px")};
   padding: 5px;
   transition: 0.5s;
   color: rgba(10,10,10,0.8);
   background-color: rgba(245,245,245,1);
+  box-sizing: border-box;
+
   width:100%;
-  
+  height:100%;
+
   &:focus {
     outline: none;
     border: 2px solid rgba(179, 46, 252, 0.3);

@@ -1,19 +1,13 @@
 //Import from Utils
-var getRandomTargetUser = require("./util/random.js").getRandomTargetUser;
-var getRandomTargetWord = require("./util/random.js").getRandomTargetWord;
 var getRandomRoles = require("./util/random.js").getRandomRoles;
 var getRandomPassword = require("./util/random.js").getRandomPassword;
 
 //Import from Updates
-var sendTargetUser = require("./updates/update.js").sendTargetUser;
-var sendTargetWord = require("./updates/update.js").sendTargetWord;
 var sendUserList = require("./updates/update.js").sendUserList;
 var sendHalfOfPass = require("./updates/update.js").sendHalfOfPass;
 var sendOtherSpies = require("./updates/update.js").sendOtherSpies;
 
 //Import from Checks
-var checkWaitingList = require("./checks/check.js").checkWaitingList;
-var checkForTargetWord = require("./checks/check.js").checkForTargetWord;
 var checkPassword = require("./checks/check.js").checkPassword;
 var findSpies = require("./checks/find.js").findSpies;
 var findLiar = require("./checks/find.js").findLiar;
@@ -82,8 +76,6 @@ module.exports = function(io) {
         addUser(addedUser, socket, io, username, userList, waitingForTarget)
       ) {
         addedUser = true;
-        //Check if anyone is on the waiting list and give them a target
-        checkWaitingList(userList, waitingForTarget, io);
 
         //Update client that login successful
         socket.emit("logged in", true);
@@ -95,13 +87,14 @@ module.exports = function(io) {
         console.log(`There are ${userList.length} players.`);
         if (userList.length < REQUIRED_PLAYERS) {
           console.log("Waiting for more players to join");
-          io.emit("chat message", {
-            username: "SERVER",
-            msg: `Waiting for ${5-userList.length} more players to join`
-          });
+          io.emit(
+            "server message",
+            `Waiting for ${5 - userList.length} more players to join`
+          );
         } else {
           //Start Game
           console.log(`There are enough players. Starting Game.`);
+          io.emit("server message", `Starting game!`);
           getRandomRoles(userList);
           console.log(userList.users);
 
@@ -137,31 +130,7 @@ module.exports = function(io) {
     //Remove the user from the list of users
     socket.on("disconnect", () => {
       //Remove User from userlist
-      waitingForTarget = removeUser(
-        addedUser,
-        socket,
-        io,
-        userList,
-        waitingForTarget
-      );
-
-      //Check if any of the names was a targeted user
-      //Replace any found with a new target
-      for (user in userList.users) {
-        const userID = user;
-        if (userList.users[userID].targetUserID == socket.id) {
-          userList.users[userID].targetUserID = getRandomTargetUser(
-            userID,
-            userList,
-            waitingForTarget
-          );
-          userList.users[userID].targetWord = getRandomTargetWord(
-            userList.users[userID].targetWord
-          );
-          sendTargetUser(userID, io, userList);
-          sendTargetWord(userID, io, userList);
-        }
-      }
+      removeUser(addedUser, socket, io, userList);
 
       //send updated userlist
       sendUserList(io, userList);
@@ -171,9 +140,9 @@ module.exports = function(io) {
       //Sanitize msg
       msg = String(msg);
 
-      //Check through user list for target words and users
+      //Check if this user was added
       if (addedUser) {
-        checkForTargetWord(msg, socket, userList, waitingForTarget, io);
+
         //Emit message to chatroom
         socket.broadcast.emit("chat message", {
           username: userList.users[socket.id].username,

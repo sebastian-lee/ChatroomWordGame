@@ -27,11 +27,9 @@ class DeleteItem extends Component {
 
   render() {
     return (
-      <div>
-        <X onClick={this.handleClick} value={this.props.value}>
-          ×
-        </X>
-      </div>
+      <X onClick={this.handleClick} value={this.props.value}>
+        ×
+      </X>
     );
   }
 }

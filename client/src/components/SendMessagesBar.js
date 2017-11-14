@@ -1,6 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import InputBar from "./InputBar";
+import styled from "styled-components";
+
+const StyledMessageBar = styled(InputBar)`
+  height: 100%;
+  input {
+    font-size: 1em;
+  }
+`;
 
 class SendMessagesBar extends Component {
   constructor(props) {
@@ -55,7 +63,7 @@ class SendMessagesBar extends Component {
 
   render() {
     return (
-      <InputBar
+      <StyledMessageBar
         formID="messaging"
         inputID="m"
         onSubmit={this.handleSendMessage}

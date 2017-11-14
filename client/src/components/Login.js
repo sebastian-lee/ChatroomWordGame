@@ -65,11 +65,10 @@ const InputSection = styled.div`
 `;
 
 const LoginBar = styled(InputBar)`
-  height: 35px;
   width:80%;
   margin-left:auto;
   margin-right:auto;
-  
+
   input {
     font-size: 1.5em;
   }

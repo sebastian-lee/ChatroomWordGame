@@ -4,11 +4,16 @@ import styled from "styled-components";
 import InputBar from "./InputBar";
 import DeleteItem from "./DeleteItem";
 
-const PasswordBar = styled(InputBar)`width: 80%;`;
+const PasswordBar = styled(InputBar)`
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+`;
 
 const GuessedPassword = styled.ul`
   list-style: none;
-  padding: 0;
+  padding: 10px;
+  margin: 0;
 
   li {
     margin: 5px 0 5px 0;
@@ -30,6 +35,7 @@ const GuessedWord = styled.p`
 const CheckButton = styled.div`
   border-radius: 10px;
   padding: 5px 10px 5px 10px;
+  margin-left: 10px;
   background-color: rgba(245, 245, 245, 1);
   color: rgba(10, 10, 10, 0.8);
   width: fit-content;
@@ -42,6 +48,11 @@ const CheckButton = styled.div`
     box-shadow: 0px 0px 0px rgba(10, 10, 10, 0.3);
     background-color: rgba(225, 225, 225, 1);
   }
+`;
+
+const PadText = styled.p`
+  margin: 0;
+  padding: 10px;
 `;
 
 class AccuseInput extends Component {
@@ -95,10 +106,10 @@ class AccuseInput extends Component {
     return (
       <div>
         <form onSubmit={this.handleAccuseAdd}>
-          Accuse:
+          <PadText> Accuse:</PadText>
           <PasswordBar round={true} inputID="accuse" />
         </form>
-        <p>Your guess</p>
+        <PadText>Your guess</PadText>
         <GuessedPassword>
           {this.state.accused.map((accused, index) => (
             <li key={index}>
@@ -110,7 +121,7 @@ class AccuseInput extends Component {
 
         <CheckButton onClick={this.handleAccuseSend}>Check</CheckButton>
 
-        <p id="result">{this.state.result}</p>
+        <PadText id="result">{this.state.result}</PadText>
       </div>
     );
   }
