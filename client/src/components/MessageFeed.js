@@ -149,6 +149,10 @@ class MessageFeed extends Component {
       this.appendNewMessage("disconnected", `${username} has left`);
     });
 
+    this.props.socket.on("game start", () => {
+      this.setState({messages: []});
+    });
+
     //Someone is typing in chat.
     this.props.socket.on("typing", username => {
       var typingList = this.state.typingList;

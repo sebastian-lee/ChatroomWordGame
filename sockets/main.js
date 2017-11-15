@@ -1,11 +1,5 @@
-//Import from Utils
-var getRandomRoles = require("./util/random.js").getRandomRoles;
-var getRandomPassword = require("./util/random.js").getRandomPassword;
-
 //Import from Updates
 var sendUserList = require("./updates/update.js").sendUserList;
-var sendHalfOfPass = require("./updates/update.js").sendHalfOfPass;
-var sendOtherSpies = require("./updates/update.js").sendOtherSpies;
 
 //Import from Checks
 var checkPassword = require("./checks/check.js").checkPassword;
@@ -16,13 +10,10 @@ var findLiar = require("./checks/find.js").findLiar;
 var addUser = require("./users/addUser.js");
 var removeUser = require("./users/removeUser.js");
 
-//Import from Init
-var applyRoleAttempts = require("./users/init.js").applyRoleAttempts;
-
 //Import from game
-var gameTimer = require("./util/game.js").gameTimer;
 var whoWon = require("./util/game.js").whoWon;
 var gameOver = require("./util/game.js").gameOver;
+var startGame = require("./util/game.js").startGame;
 
 //Player Count
 const REQUIRED_PLAYERS = 5;
@@ -94,37 +85,20 @@ module.exports = function(io) {
           );
         } else {
           //Start Game
-          console.log(`There are enough players. Starting Game.`);
-          io.emit("server message", `Starting game!`);
-          getRandomRoles(userList);
-          console.log(userList.users);
+          if (!gameInProgress) {
+            console.log(`There are enough players. Starting Game.`);
 
-          //Send roles to each player
-          for (user in userList.users) {
-            let role = userList.users[user].role;
-            io.to(user).emit("my role", role);
+            //Start Game
+            timer = startGame(
+              io,
+              userList,
+              DETECTIVE_ATTEMPT_AMOUNT,
+              SPY_ATTEMPT_AMOUNT,
+              LIAR_ATTEMPT_AMOUNT,
+              GAME_LENGTH
+            );
+            gameInProgress = true;
           }
-          //Apply number attempts for each role
-          applyRoleAttempts(
-            userList,
-            DETECTIVE_ATTEMPT_AMOUNT,
-            SPY_ATTEMPT_AMOUNT,
-            LIAR_ATTEMPT_AMOUNT
-          );
-          console.log(userList);
-
-          console.log("Generating Password");
-          userList.password = getRandomPassword();
-          console.log(`Password is ${userList.password}`);
-          //Send half of password to the two spies
-          sendHalfOfPass(io, userList, userList.password);
-          //Send who the other spy is
-          sendOtherSpies(io, userList);
-
-          //Start Timer
-          timer = gameTimer(io, GAME_LENGTH);
-          io.emit("game start");
-          gameInProgress = true;
         }
       }
     });
@@ -173,6 +147,9 @@ module.exports = function(io) {
     });
 
     socket.on("password submit", function(password) {
+      //Check if password came from a spy
+      if (userList.users[socket.id].role != "spy") return;
+
       console.log("Checking if password is correct");
       console.log(password);
 
@@ -197,6 +174,9 @@ module.exports = function(io) {
     });
 
     socket.on("accused submit", function(accused) {
+      //Check if input came from a detective
+      if (userList.users[socket.id].role != "detective") return;
+
       console.log("Checking if accused is correct");
       console.log(accused);
 
@@ -234,22 +214,22 @@ module.exports = function(io) {
             }
           }
         }
-      }
 
-      let attempts = --userList.users[socket.id].attempts;
-      console.log(`Picked spies: ${match}`);
-      if (match) {
-        console.log("Detectives win!");
-        gameOver(io, whoWon(true, false, false), timer);
-        gameInProgress = false;
-      } else {
-        console.log("Did not pick spies");
-        socket.emit("accused result", match, attempts);
-      }
-      if (userList.users[socket.id].attempts <= 0) {
-        console.log("GAME OVER: Detectives loses");
-        gameOver(io, whoWon(false, true, true), timer);
-        gameInProgress = false;
+        let attempts = --userList.users[socket.id].attempts;
+        console.log(`Picked spies: ${match}`);
+        if (match) {
+          console.log("Detectives win!");
+          gameOver(io, whoWon(true, false, false), timer);
+          gameInProgress = false;
+        } else {
+          console.log("Did not pick spies");
+          socket.emit("accused result", match, attempts);
+        }
+        if (userList.users[socket.id].attempts <= 0) {
+          console.log("GAME OVER: Detectives loses");
+          gameOver(io, whoWon(false, true, true), timer);
+          gameInProgress = false;
+        }
       }
     });
 
@@ -264,35 +244,15 @@ module.exports = function(io) {
         } else {
           //Start Game
           console.log(`There are enough players. Starting Game.`);
-          io.emit("server message", `Starting game!`);
-          getRandomRoles(userList);
-          console.log(userList.users);
-
-          //Send roles to each player
-          for (user in userList.users) {
-            let role = userList.users[user].role;
-            io.to(user).emit("my role", role);
-          }
-          //Apply number attempts for each role
-          applyRoleAttempts(
+          timer = startGame(
+            io,
             userList,
             DETECTIVE_ATTEMPT_AMOUNT,
             SPY_ATTEMPT_AMOUNT,
-            LIAR_ATTEMPT_AMOUNT
+            LIAR_ATTEMPT_AMOUNT,
+            GAME_LENGTH
           );
-          console.log(userList);
-
-          console.log("Generating Password");
-          userList.password = getRandomPassword();
-          console.log(`Password is ${userList.password}`);
-          //Send half of password to the two spies
-          sendHalfOfPass(io, userList, userList.password);
-          //Send who the other spy is
-          sendOtherSpies(io, userList);
-
-          //Start Timer
-          timer = gameTimer(io, GAME_LENGTH);
-          io.emit("game start");
+          gameInProgress = true;
         }
       }
     });

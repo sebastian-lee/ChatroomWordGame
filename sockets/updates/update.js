@@ -2,11 +2,11 @@ var findSpies = require("../checks/find.js").findSpies;
 
 //Sends the user list as well as the score
 function sendUserList(io, userList) {
-  let userScoreList = {};
+  let list = {};
   for (user in userList.users) {
-    userScoreList[userList.users[user].username] = userList.users[user].score;
+    list[userList.users[user].username] = userList.users[user].score;
   }
-  io.emit("update userScorelist", userScoreList);
+  io.emit("update userlist", list);
 }
 
 function sendHalfOfPass(io, userList, password) {

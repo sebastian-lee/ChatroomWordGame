@@ -54,39 +54,23 @@ class UserList extends Component {
     super(props);
 
     this.state = {
-      userScoreList: {}
+      userlist: {}
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
   }
 
   componentDidMount() {
-    this.props.socket.on("update userScorelist", userScoreList =>
-      this.setState(() => ({ userScoreList: userScoreList }))
+    this.props.socket.on("update userlist", userlist =>
+      this.setState(() => ({ userlist }))
     );
-
-    this.props.socket.on("update score", (username, score) => {
-      let newScore = this.state.userScoreList;
-      newScore[username] = score;
-      this.setState(() => ({ userScorelist: newScore }));
-
-      let scored = document.getElementById(`${username}Score`);
-      if(scored.classList.contains("pointIncrease")){
-        scored.classList.remove("pointIncrease");
-      }
-      //Adding this line causes a reflow allowing the animation to play itself again
-      void scored.offsetWidth;
-      
-      scored.classList.add("pointIncrease");
-    });
   }
 
   render() {
     let list = [];
-    let userScoreList = this.state.userScoreList;
-    for (var user in userScoreList) {
-      //list.push(`${user}: ${this.state.userScoreList[user]}`);
-      list.push([user, userScoreList[user]]);
+    let userlist = this.state.userlist;
+    for (var user in userlist) {
+      list.push([user, userlist[user]]);
     }
 
     return (

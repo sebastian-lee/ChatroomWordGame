@@ -3,63 +3,15 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import InputBar from "./InputBar";
 import DeleteItem from "./DeleteItem";
+import RoleInput from "./RoleInput";
 
-const PasswordBar = styled(InputBar)`
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-`;
-
-const GuessedPassword = styled.ul`
-  list-style: none;
-  padding: 10px;
-  margin: 0;
-
-  li {
-    margin: 5px 0 5px 0;
-    display: grid;
-    grid-template-columns: 80% 20%;
-  }
-`;
-
-const GuessedWord = styled.p`
-  grid-column: 1;
-  margin: 0;
-  color: rgba(10, 10, 10, 0.8);
-
-  border-radius: 15px;
-  padding: 5px;
-  background-color: rgba(245, 245, 245, 1);
-`;
-
-const CheckButton = styled.div`
-  border-radius: 10px;
-  padding: 5px 10px 5px 10px;
-  margin-left: 10px;
-  background-color: rgba(245, 245, 245, 1);
-  color: rgba(10, 10, 10, 0.8);
-  width: fit-content;
-  transform: translateY(-2px);
-  box-shadow: 0px 2px 2px rgba(10, 10, 10, 0.3);
-  transition: 0.3s;
-
-  &:active {
-    transform: translateY(0px);
-    box-shadow: 0px 0px 0px rgba(10, 10, 10, 0.3);
-    background-color: rgba(225, 225, 225, 1);
-  }
-`;
+import PadText from "./PadText";
 
 const InitPass = styled.div`
   border-bottom: 2px solid rgba(10, 10, 10, 0.2);
   border-top: 2px solid rgba(10, 10, 10, 0.2);
   margin: 5px auto 5px auto;
   text-align: center;
-`;
-
-const PadText = styled.p`
-  margin: 0;
-  padding: 10px;
 `;
 
 class PasswordInput extends Component {
@@ -124,23 +76,15 @@ class PasswordInput extends Component {
           ))}
         </InitPass>
 
-        <form onSubmit={this.handlePasswordAdd}>
-          <PadText>Password:</PadText>
-          <PasswordBar round={true} inputID="password" />
-        </form>
-        <PadText>Your guess</PadText>
-        <GuessedPassword>
-          {this.state.password.map((keyWord, index) => (
-            <li key={index}>
-              <GuessedWord>{keyWord}</GuessedWord>
-              <DeleteItem onXClick={this.handleDeleteWord} value={index} />
-            </li>
-          ))}
-        </GuessedPassword>
-
-        <CheckButton onClick={this.handlePasswordSend}>Check</CheckButton>
-
-        <PadText id="result">{this.state.result}</PadText>
+        <RoleInput
+          handleInputAdd={this.handlePasswordAdd}
+          inputText={"Password:"}
+          inputID={"password"}
+          GuessList={this.state.password}
+          handleDeleteWord={this.handleDeleteWord}
+          handleInputSend={this.handlePasswordSend}
+          result={this.state.result}
+        />
       </div>
     );
   }

@@ -76,13 +76,7 @@ class Roles extends Component {
 
         <RoleBackground>
           {this.props.role === "spy" && <Spy socket={this.props.socket} />}
-          {this.props.role === "spy" && (
-            <PasswordInput socket={this.props.socket} />
-          )}
-          {this.props.role === "detective" && <Detective/>}
-          {this.props.role === "detective" && (
-            <AccuseInput socket={this.props.socket} />
-          )}
+          {this.props.role === "detective" && <Detective socket={this.props.socket}/>}
           {this.props.role === "liar" && <Liar />}
         </RoleBackground>
       </RoleContainer>

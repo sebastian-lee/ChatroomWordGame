@@ -2,15 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
-const Instructions = styled.p`
-margin:0;
-padding: 10px;
-`;
-
-const PadText = styled.p`
-margin: 0;
-padding: 10px;
-`;
+import PadText from "./PadText";
+import PasswordInput from "./PasswordInput";
 
 class Spy extends Component {
   componentDidMount() {
@@ -25,16 +18,20 @@ class Spy extends Component {
   render() {
     return (
       <div>
-        <Instructions>
-          Figure out what the rest of the 6 word password is. 
-          <br/><br/>
-          Your fellow spy has the rest of the password, but both of you don't want to get caught 
-          by the detectives.
-          <br/><br/>
+        <PadText>
+          Figure out what the rest of the 6 word password is.
+          <br />
+          <br />
+          Your fellow spy has the rest of the password, but both of you don't
+          want to get caught by the detectives.
+          <br />
+          <br />
           You each have 3 attempts at guessing the password.
-        </Instructions>
+        </PadText>
 
-        <PadText id="otherSpies" ></PadText>
+        <PadText id="otherSpies" />
+
+        <PasswordInput socket={this.props.socket} />
       </div>
     );
   }
