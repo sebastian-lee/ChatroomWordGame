@@ -7,6 +7,14 @@ function addUser(addedUser, socket, io, username, userList, waitingForTarget) {
     console.log("User already added");
     return false;
   }
+  //Check if username has characters
+  if(!/\S/g.test(username)){
+    socket.emit("invalid username");
+    return false;
+  }
+
+  //Trim whitespace
+  username = username.trim();
 
   if (!checkUniqueUsername(socket, username, userList)) {
     socket.emit("not unique username");

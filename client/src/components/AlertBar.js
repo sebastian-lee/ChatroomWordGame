@@ -45,6 +45,32 @@ const AlertSection = styled.div`
   }
 `;
 
+const RestartButton = styled.div`
+  border-radius: 10px;
+  padding: 5px 10px 5px 10px;
+  margin: 10px auto 10px auto;
+
+  background-color: rgba(245, 245, 245, 1);
+  color: rgb(178, 131, 211);
+  width: fit-content;
+  transform: translateY(-2px);
+  box-shadow: 0px 2px 2px rgba(10, 10, 10, 0.3);
+  transition: 0.3s;
+  border: 2px solid rgba(179, 46, 252, 0);
+
+  &:active {
+    transform: translateY(0px);
+    box-shadow: 0px 0px 0px rgba(10, 10, 10, 0.3);
+    background-color: rgba(225, 225, 225, 1);
+  }
+
+  &:hover {
+    background-color: rgba(225, 225, 225, 1);
+    border: 2px solid rgba(179, 46, 252, 0.5);
+    border-style: inset;
+  }
+`;
+
 class AlertBar extends Component {
   constructor(props) {
     super(props);
@@ -55,6 +81,12 @@ class AlertBar extends Component {
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
+    this.handleRestart = this.handleRestart.bind(this);
+  }
+
+  handleRestart() {
+    this.props.socket.emit("restart game", true);
+    this.setState(() => ({ alertScreen: false }));
   }
 
   componentDidMount() {
@@ -100,6 +132,10 @@ class AlertBar extends Component {
       this.setState(() => ({ alertScreen: true }));
       this.setState(() => ({ message: gameoverStatement }));
     });
+
+    this.props.socket.on("game start", () => {
+      this.setState(() => ({ alertScreen: false }));
+    });
   }
 
   render() {
@@ -107,6 +143,9 @@ class AlertBar extends Component {
       <AlertScreen alert={this.state.alertScreen} id="alertScreen">
         <AlertSection>
           <p>{this.state.message}</p>
+          <RestartButton onClick={this.handleRestart}>
+            <p>Restart Game?</p>
+          </RestartButton>
         </AlertSection>
       </AlertScreen>
     );

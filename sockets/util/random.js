@@ -31,9 +31,10 @@ function getRandomRoles(userList) {
 
 const PASS_LENGTH = 6;
 
-function getRandomPassword(password) {
+function getRandomPassword() {
   //push random words into the password array
   let passwordArr = wordDatabase;
+  let password = [];
   for (let i = 0; i < PASS_LENGTH; i++) {
     let randNum = getRandomInt(0, passwordArr.length);
     password.push(passwordArr[randNum]);
@@ -41,6 +42,7 @@ function getRandomPassword(password) {
       .slice(0, randNum)
       .concat(passwordArr.slice(randNum + 1, passwordArr.length));
   }
+  return password;
 }
 
 module.exports = {

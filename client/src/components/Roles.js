@@ -52,13 +52,17 @@ class Roles extends Component {
     });
 
     //list time left
-    this.props.socket.on("time left", function(timeLeft) {
+    this.props.socket.on("time left", function(timeLeft) { 
       let remainingSecs = timeLeft / 1000;
       let mins = Math.floor(remainingSecs / 60);
-      remainingSecs = Math.round(remainingSecs % 60);
+      remainingSecs = Math.floor(remainingSecs % 60);
+      if(timeLeft <= 0){
+        mins = 0;
+        remainingSecs = 0;
+      }
       document.querySelector(
         "#timer"
-      ).textContent = `Time Remaining: ${mins}:${remainingSecs}`;
+      ).textContent = `Time Remaining: ${mins}:${(remainingSecs <10)? "0" + remainingSecs:remainingSecs}`;
     });
   }
   render() {

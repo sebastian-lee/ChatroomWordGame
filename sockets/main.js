@@ -47,6 +47,7 @@ module.exports = function(io) {
   };
 
   var timer;
+  var gameInProgress = false;
 
   //List of waiting socket ids
   var waitingForTarget = [];
@@ -113,7 +114,7 @@ module.exports = function(io) {
           console.log(userList);
 
           console.log("Generating Password");
-          getRandomPassword(userList.password);
+          userList.password = getRandomPassword();
           console.log(`Password is ${userList.password}`);
           //Send half of password to the two spies
           sendHalfOfPass(io, userList, userList.password);
@@ -122,6 +123,8 @@ module.exports = function(io) {
 
           //Start Timer
           timer = gameTimer(io, GAME_LENGTH);
+          io.emit("game start");
+          gameInProgress = true;
         }
       }
     });
@@ -142,7 +145,6 @@ module.exports = function(io) {
 
       //Check if this user was added
       if (addedUser) {
-
         //Emit message to chatroom
         socket.broadcast.emit("chat message", {
           username: userList.users[socket.id].username,
@@ -181,6 +183,7 @@ module.exports = function(io) {
         console.log("Right! Spies win!");
         socket.emit("password result", match, attempts);
         gameOver(io, whoWon(false, true, false), timer);
+        gameInProgress = false;
       } else {
         console.log("Wrong Pass");
         socket.emit("password result", match, attempts);
@@ -189,6 +192,7 @@ module.exports = function(io) {
       if (userList.users[socket.id].attempts <= 0) {
         console.log("GAME OVER: Spies loses");
         gameOver(io, whoWon(true, false, true), timer);
+        gameInProgress = false;
       }
     });
 
@@ -224,6 +228,7 @@ module.exports = function(io) {
                 if (userList.users[user].attempts <= 0) {
                   console.log("LIAR WINS!");
                   gameOver(io, whoWon(false, false, true), timer);
+                  gameInProgress = false;
                 }
               }
             }
@@ -236,6 +241,7 @@ module.exports = function(io) {
       if (match) {
         console.log("Detectives win!");
         gameOver(io, whoWon(true, false, false), timer);
+        gameInProgress = false;
       } else {
         console.log("Did not pick spies");
         socket.emit("accused result", match, attempts);
@@ -243,6 +249,51 @@ module.exports = function(io) {
       if (userList.users[socket.id].attempts <= 0) {
         console.log("GAME OVER: Detectives loses");
         gameOver(io, whoWon(false, true, true), timer);
+        gameInProgress = false;
+      }
+    });
+
+    socket.on("restart game", function(restart) {
+      if (restart == true && !gameInProgress) {
+        if (userList.length < REQUIRED_PLAYERS) {
+          console.log("Waiting for more players to join");
+          io.emit(
+            "server message",
+            `Waiting for ${5 - userList.length} more players to join`
+          );
+        } else {
+          //Start Game
+          console.log(`There are enough players. Starting Game.`);
+          io.emit("server message", `Starting game!`);
+          getRandomRoles(userList);
+          console.log(userList.users);
+
+          //Send roles to each player
+          for (user in userList.users) {
+            let role = userList.users[user].role;
+            io.to(user).emit("my role", role);
+          }
+          //Apply number attempts for each role
+          applyRoleAttempts(
+            userList,
+            DETECTIVE_ATTEMPT_AMOUNT,
+            SPY_ATTEMPT_AMOUNT,
+            LIAR_ATTEMPT_AMOUNT
+          );
+          console.log(userList);
+
+          console.log("Generating Password");
+          userList.password = getRandomPassword();
+          console.log(`Password is ${userList.password}`);
+          //Send half of password to the two spies
+          sendHalfOfPass(io, userList, userList.password);
+          //Send who the other spy is
+          sendOtherSpies(io, userList);
+
+          //Start Timer
+          timer = gameTimer(io, GAME_LENGTH);
+          io.emit("game start");
+        }
       }
     });
 
