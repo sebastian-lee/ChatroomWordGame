@@ -6,9 +6,10 @@ import styled from "styled-components";
 import Login from "./components/Login";
 import MessageFeed from "./components/MessageFeed";
 import UserList from "./components/UserList";
-import Targets from "./components/Targets";
+import Roles from "./components/Roles";
 import SendMessagesBar from "./components/SendMessagesBar";
 import MenuButton from "./components/MenuButton";
+import AlertBar from "./components/AlertBar";
 
 const socket = io();
 
@@ -43,7 +44,7 @@ const SideSection = styled.div`
   grid-column: 5/6;
   grid-row: 1/6;
   display: grid;
-  grid-template-rows: 70% 30%;
+  grid-template-rows: 30% 70%;
   width: 100%;
   z-index: 0;
   transition: 0.5s;
@@ -77,13 +78,9 @@ const SidebarButton = styled.div`
   }
 `;
 
-const UserListSection = styled.div`
-  grid-row: 1;
-`;
+const UserListSection = styled.div`grid-row: 1;`;
 
-const TargetSection = styled.div`
-  grid-row: 2;
-`;
+const RolesSection = styled.div`grid-row: 2;`;
 
 /*
  * Input Section
@@ -98,13 +95,16 @@ const InputSection = styled.div`
   }
 `;
 
+
+
 export default class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       blur: true,
-      sideOut: false
+      sideOut: false,
+      role: ""
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -112,7 +112,12 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    socket.on("logged in", success => this.setState(() => ({ blur: false })));
+    socket.on("logged in", success =>
+      this.setState(() => ({ blur: !success }))
+    );
+
+    //add your role
+    socket.on("my role", role => this.setState(() => ({ role: role })));
   }
 
   toggleSideBar() {
@@ -124,6 +129,7 @@ export default class App extends Component {
     return (
       <div className="App">
         <Login socket={socket} />
+        <AlertBar socket={socket} />
         <Grid blur={this.state.blur}>
           <MessageSection>
             <MessageFeed socket={socket} />
@@ -137,9 +143,9 @@ export default class App extends Component {
               <UserList socket={socket} />
             </UserListSection>
 
-            <TargetSection>
-              <Targets socket={socket} />
-            </TargetSection>
+            <RolesSection>
+              <Roles socket={socket} role={this.state.role} />
+            </RolesSection>
           </SideSection>
 
           <InputSection>

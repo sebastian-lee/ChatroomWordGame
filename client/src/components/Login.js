@@ -65,10 +65,13 @@ const InputSection = styled.div`
 `;
 
 const LoginBar = styled(InputBar)`
-  height: 35px;
-  width:80%;
-  margin-left:auto;
-  margin-right:auto;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+
+  input {
+    font-size: 1.5em;
+  }
 `;
 
 class Login extends Component {
@@ -103,18 +106,26 @@ class Login extends Component {
       document.getElementById("loginHeader").textContent =
         "Username taken, try another one";
     });
+
+    this.props.socket.on("invalid username", () => {
+      document.getElementById("loginHeader").textContent =
+        "Invalid Username, try another one";
+    });
   }
 
   render() {
     return (
       <LoginScreen loggedIn={this.state.loggedIn} id="loginScreen">
         <LoginSection>
-          <Header>Chatroom Word Game</Header>
-          <p>Convince your target to say your target word!</p>
+          <Header>Chatroom Spy Game</Header>
+          <p>
+            Try to figure out the password as a spy, find who the spies are as a
+            detective or feign being a spy as a liar!
+          </p>
           <InputSection>
             <h2 id="loginHeader">Enter a username</h2>
             <LoginBar
-              login={true}
+              round={true}
               formID="usernameForm"
               inputID="username"
               onSubmit={this.handleUsernameSubmit}

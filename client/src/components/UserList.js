@@ -22,7 +22,7 @@ const UserListHeader = styled.h1`
     font-size:1em;
   }
 `;
-const Scoreboard = styled.div`
+const Userboard = styled.div`
   grid-row: 2;
   background: rgba(10, 10, 10, 0.2);
   border-radius: 5px;
@@ -33,8 +33,6 @@ const Scoreboard = styled.div`
   overflow-y: scroll;
   margin: 0 10px 10px 10px;
   padding: 0;
-  display: grid;
-  grid-template-columns: 70% 30%;
 
   @media (max-height: 500px) {
     height: 100px;
@@ -46,32 +44,9 @@ const Scoreboard = styled.div`
 `;
 
 const Users = styled.ul`
-  grid-column: 1;
   list-style-type: none;
   padding: 10px 0px 10px 10px;
   margin: 0;
-`;
-const Scores = styled.ul`
-  grid-column: 2;
-  list-style-type: none;
-  text-align: center;
-  padding: 10px 0px 10px 0px;
-  margin: 0;
-  border-left: 2px solid rgba(10, 10, 10, 0.2);
-`;
-
-const increasedScore = keyframes`
-  from {
-    transform: translateY(0px);
-  }
-
-  to {
-    transform: translateY(-5px);
-    color: red;
-  }
-`;
-
-const Score = styled.li`
 `;
 
 class UserList extends Component {
@@ -117,7 +92,7 @@ class UserList extends Component {
     return (
       <UserListContainer>
         <UserListHeader>User List</UserListHeader>
-        <Scoreboard>
+        <Userboard>
           <Users className="userlist">
             {list.map((user, index) => (
               <li id={`${user[0]}List`} key={index}>
@@ -125,14 +100,7 @@ class UserList extends Component {
               </li>
             ))}
           </Users>
-          <Scores>
-            {list.map((user, index) => (
-              <Score id={`${user[0]}Score`} key={index}>
-                {user[1]}
-              </Score>
-            ))}
-          </Scores>
-        </Scoreboard>
+        </Userboard>
       </UserListContainer>
     );
   }

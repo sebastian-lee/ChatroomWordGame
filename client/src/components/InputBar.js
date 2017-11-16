@@ -7,28 +7,26 @@ import styled from "styled-components";
 
 //Adding styling to change if its the username submission or messaging bar
 const StyledForm = styled.form`
-  width: 100%;
-  height: 100%;
-  display: grid;
 `;
 
 const StyledInput = styled.input`
-  grid-column: 1;
-  font-size: 1.5em;
   border: 2px solid rgba(179, 46, 252, 0);
-  border-radius: ${props => (props.login ? "15px" : "0px")};
+  border-radius: ${props => (props.round ? "15px" : "0px")};
   padding: 5px;
   transition: 0.5s;
   color: rgba(10,10,10,0.8);
   background-color: rgba(245,245,245,1);
+  box-sizing: border-box;
+
   width:100%;
-  
+  height:100%;
+
   &:focus {
     outline: none;
     border: 2px solid rgba(179, 46, 252, 0.3);
     border-style: inset;
-    ${props => (props.login ? "transform: translateY(-2px)" : "")};
-    ${props => (props.login ? "box-shadow: 0px 2px 2px rgba(10,10,10,0.3);" : "")};
+    ${props => (props.round ? "transform: translateY(-2px)" : "")};
+    ${props => (props.round ? "box-shadow: 0px 2px 2px rgba(10,10,10,0.3);" : "")};
   }
 
   &:hover {
@@ -41,12 +39,12 @@ const StyledInput = styled.input`
 function InputBar(props) {
   return (
     <StyledForm
-      login={props.login}
+      round={props.round}
       className={props.className}
       id={props.formID}
       onSubmit={props.onSubmit}
     >
-      <StyledInput login={props.login} id={props.inputID} autoComplete="off" />
+      <StyledInput round={props.round} id={props.inputID} autoComplete="off" />
     </StyledForm>
   );
 }

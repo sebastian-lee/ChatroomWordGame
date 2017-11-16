@@ -16,38 +16,38 @@ function getRandomUser(userList) {
   return clients[getRandomInt(0, clients.length)];
 }
 
-//Returns a random user socketID that is not self
-function getRandomTargetUser(self, userList, waitingForTarget) {
-  //If there are no other users put on waiting
-  if (userList.length <= 1) {
-    waitingForTarget.push(self);
-    return null;
+function getRandomRoles(userList) {
+  let roles = ["spy", "spy", "detective", "detective", "liar"];
+
+  for (user in userList.users) {
+    if (roles.length == 0) return;
+    let randNum = getRandomInt(0, roles.length);
+    userList.users[user].role = roles[randNum];
+    roles = roles
+      .slice(0, randNum)
+      .concat(roles.slice(randNum + 1, roles.length));
   }
-
-  var targetUser = getRandomUser(userList);
-
-  //Keep calling getRandomTargetUser until you get another user
-  if (targetUser == self) {
-    return getRandomTargetUser(self, userList, waitingForTarget);
-  }
-
-  return targetUser;
 }
 
-//Get a random Target word from the wordDatabase that isn't the last word
-function getRandomTargetWord(lastWord = null) {
-  let newWord = wordDatabase[getRandomInt(0, wordDatabase.length)];
+const PASS_LENGTH = 6;
 
-  if (newWord == lastWord) {
-    return getRandomTargetWord(lastWord);
+function getRandomPassword() {
+  //push random words into the password array
+  let passwordArr = wordDatabase;
+  let password = [];
+  for (let i = 0; i < PASS_LENGTH; i++) {
+    let randNum = getRandomInt(0, passwordArr.length);
+    password.push(passwordArr[randNum]);
+    passwordArr = passwordArr
+      .slice(0, randNum)
+      .concat(passwordArr.slice(randNum + 1, passwordArr.length));
   }
-
-  return newWord;
+  return password;
 }
 
 module.exports = {
   getRandomInt,
   getRandomUser,
-  getRandomTargetUser,
-  getRandomTargetWord
+  getRandomRoles,
+  getRandomPassword
 };

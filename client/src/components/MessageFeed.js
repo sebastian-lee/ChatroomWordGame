@@ -86,6 +86,13 @@ const Message = styled.li`
             font-weight: bold;
             background: none;
           `;
+        case "server":
+          return `
+            color: rgba(130, 130, 180, 1);
+            font-size: 1.1em;
+            font-weight: bold;
+            background: none;
+          `;
         default:
           return "background: rgba(113, 0, 176, 0.7);";
       }
@@ -130,6 +137,11 @@ class MessageFeed extends Component {
     //Notify that a user has joined the server
     this.props.socket.on("user connected", username => {
       this.appendNewMessage("connected", `${username} has joined`);
+    });
+    
+    //Notify that a user has joined the server
+    this.props.socket.on("server message", msg => {
+      this.appendNewMessage("server", msg);
     });
 
     //Notify that a user has left the server
