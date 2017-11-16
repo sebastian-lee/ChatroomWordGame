@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "PORT=3001 node ./bin/www",
+    "start": "node ./bin/www",
     "devstart": "PORT=3001 nodemon ./bin/www",
-    "heroku-postbuild" : "cd client && npm run start"    
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
