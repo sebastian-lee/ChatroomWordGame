@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import styled, { keyframes } from "styled-components";
-import '../utils/animation.css';
 
 //Main: 113, 0, 176 purple
 //Secondary: 255, 211, 0 yellow

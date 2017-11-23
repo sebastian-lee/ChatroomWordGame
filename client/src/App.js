@@ -17,7 +17,7 @@ const socket = io();
 const Grid = styled.div`
   display: grid;
   grid-template: repeat(4, 1fr) 0.3fr / repeat(5, 20%);
-  height: 100vh;
+  height: 100%;
   filter: blur(${props => (props.blur ? "5px" : "0px")});
   transition: 0.3s;
   overflow-x: hidden;

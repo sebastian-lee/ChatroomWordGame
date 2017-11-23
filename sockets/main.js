@@ -13,6 +13,7 @@ var removeUser = require("./users/removeUser.js");
 //Import from game
 var whoWon = require("./util/game.js").whoWon;
 var gameOver = require("./util/game.js").gameOver;
+var stopGame = require("./util/game.js").stopGame;
 var startGame = require("./util/game.js").startGame;
 
 //Player Count
@@ -111,6 +112,17 @@ module.exports = function(io) {
 
       //send updated userlist
       sendUserList(io, userList);
+
+      //If game is in progress, end game
+      if(gameInProgress){
+        gameInProgress = false;
+        stopGame(timer);
+        console.log("Waiting to start new game");
+        io.emit(
+          "server message",
+          `Waiting for ${5 - userList.length} more players to join`
+        );
+      }
     });
 
     socket.on("chat message", function(msg) {

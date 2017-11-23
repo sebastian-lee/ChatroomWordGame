@@ -50,6 +50,10 @@ function gameOver(io, winners, timer) {
   stopTimer(timer);
 }
 
+function stopGame(timer){
+  stopTimer(timer);
+}
+
 //Start Game
 function startGame(
   io,
@@ -94,6 +98,7 @@ function startGame(
 
 module.exports = {
   gameTimer,
+  stopGame,
   whoWon,
   gameOver,
   startGame
