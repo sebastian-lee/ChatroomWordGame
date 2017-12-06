@@ -10,6 +10,7 @@ import Roles from "./components/Roles";
 import SendMessagesBar from "./components/SendMessagesBar";
 import MenuButton from "./components/MenuButton";
 import AlertBar from "./components/AlertBar";
+import GameSetting from "./components/GameSetting";
 
 const socket = io();
 
@@ -17,10 +18,11 @@ const socket = io();
 const Grid = styled.div`
   display: grid;
   grid-template: repeat(4, 1fr) 0.3fr / repeat(5, 20%);
-  height: 100%;
+  min-height: 100%;
   filter: blur(${props => (props.blur ? "5px" : "0px")});
   transition: 0.3s;
   overflow-x: hidden;
+  overflow-y: hidden;
 `;
 
 /*
@@ -130,6 +132,7 @@ export default class App extends Component {
       <div className="App">
         <Login socket={socket} />
         <AlertBar socket={socket} />
+        <GameSetting socket={socket} />
         <Grid blur={this.state.blur}>
           <MessageSection>
             <MessageFeed socket={socket} />

@@ -61,7 +61,8 @@ function startGame(
   DETECTIVE_ATTEMPT_AMOUNT,
   SPY_ATTEMPT_AMOUNT,
   LIAR_ATTEMPT_AMOUNT,
-  GAME_LENGTH
+  GAME_LENGTH,
+  wordList
 ) {
   
   getRandomRoles(userList);
@@ -82,7 +83,7 @@ function startGame(
   console.log(userList);
 
   console.log("Generating Password");
-  userList.password = getRandomPassword();
+  userList.password = getRandomPassword(wordList);
   console.log(`Password is ${userList.password}`);
   //Send half of password to the two spies
   sendHalfOfPass(io, userList, userList.password);

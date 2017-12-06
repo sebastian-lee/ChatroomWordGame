@@ -16,6 +16,9 @@ var gameOver = require("./util/game.js").gameOver;
 var stopGame = require("./util/game.js").stopGame;
 var startGame = require("./util/game.js").startGame;
 
+//Word list options
+var wordDatabase = require("./wordDatabase");
+
 //Player Count
 const REQUIRED_PLAYERS = 5;
 const SPY_AMOUNT = 2;
@@ -34,6 +37,7 @@ module.exports = function(io) {
   //User List
   var userList = {
     length: 0,
+    order: [],
     password: [],
     users: {}
   };
@@ -64,7 +68,6 @@ module.exports = function(io) {
       //Sanitize username
       username = String(username);
       console.log("new username " + username);
-
       if (
         addUser(addedUser, socket, io, username, userList, waitingForTarget)
       ) {
@@ -87,21 +90,26 @@ module.exports = function(io) {
         } else {
           //Start Game
           if (!gameInProgress) {
-            console.log(`There are enough players. Starting Game.`);
-
-            //Start Game
-            timer = startGame(
-              io,
-              userList,
-              DETECTIVE_ATTEMPT_AMOUNT,
-              SPY_ATTEMPT_AMOUNT,
-              LIAR_ATTEMPT_AMOUNT,
-              GAME_LENGTH
-            );
-            gameInProgress = true;
+            console.log(`There are enough players.`);
+            let options = wordDatabase.options;
+            io.to(userList.order[0]).emit("game settings", options);
           }
         }
       }
+    });
+
+    socket.on("start game",(wordList)=>{
+      //Start Game
+      timer = startGame(
+        io,
+        userList,
+        DETECTIVE_ATTEMPT_AMOUNT,
+        SPY_ATTEMPT_AMOUNT,
+        LIAR_ATTEMPT_AMOUNT,
+        GAME_LENGTH,
+        wordDatabase[wordList]
+      );
+      gameInProgress = true;
     });
 
     //User has left

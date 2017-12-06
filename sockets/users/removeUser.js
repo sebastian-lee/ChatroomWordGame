@@ -8,6 +8,12 @@ function removeUser(addedUser, socket, io, userList) {
     if (userList.length > 0) {
       userList.length--;
     }
+    let userIndex = userList.order.indexOf(socket.id);
+    if (userIndex != -1) {
+      userList.order = userList.order
+        .slice(0, userIndex)
+        .concat(userList.order.slice(userIndex + 1));
+    }
     delete userList.users[socket.id];
   }
 }

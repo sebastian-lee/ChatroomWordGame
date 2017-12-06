@@ -1,5 +1,3 @@
-var wordDatabase = require("../wordDatabase");
-
 //Returns a random int between a min and max
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -31,7 +29,7 @@ function getRandomRoles(userList) {
 
 const PASS_LENGTH = 6;
 
-function getRandomPassword() {
+function getRandomPassword(wordDatabase) {
   //push random words into the password array
   let passwordArr = wordDatabase;
   let password = [];

@@ -23,6 +23,9 @@ function addUser(addedUser, socket, io, username, userList, waitingForTarget) {
 
   console.log("a user connected");
   io.emit("user connected", username);
+  
+  userList.order.push(socket.id); 
+  
   userList.length++;
 
   userList.users[socket.id] = {

@@ -13,21 +13,21 @@ const LoginScreen = styled.div`
   position: absolute;
   background: rgba(10, 10, 10, 0.2);
   display: ${props => (props.loggedIn ? "none" : "grid")};
-  grid-template-row: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   color: rgba(250, 250, 250, 1);
   text-shadow: 0px 1px 1px rgba(10, 10, 10, 0.8);
 `;
 
 const LoginSection = styled.div`
   text-align: center;
-  height: 300px;
+  height: 350px;
   width: 400px;
   margin-left: auto;
   margin-right: auto;
   grid-row: 2;
   z-index: 1;
   display: grid;
-  grid-template-row: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
   background: rgba(113, 0, 176, 0.5);
   border-radius: 15px;
   padding: 15px;
