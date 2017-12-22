@@ -1,9 +1,9 @@
-function removeUser(addedUser, socket, io, userList) {
+function removeUser(addedUser, socket, io, room, userList) {
   if (addedUser) {
     console.log("user disconnected");
     username = userList.users[socket.id].username;
 
-    io.emit("user disconnected", username);
+    io.to(room).emit("user disconnected", username);
     //Subtract user list length
     if (userList.length > 0) {
       userList.length--;

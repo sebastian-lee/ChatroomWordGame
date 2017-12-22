@@ -5,7 +5,7 @@ var applyRoleAttempts = require("../users/init.js").applyRoleAttempts;
 var sendHalfOfPass = require("../updates/update.js").sendHalfOfPass;
 var sendOtherSpies = require("../updates/update.js").sendOtherSpies;
 
-function gameTimer(io, GAME_LENGTH) {
+function gameTimer(io, room, GAME_LENGTH) {
   let startTime = Date.now();
   let endTime = startTime + GAME_LENGTH * 60 * 1000;
   let timer = setInterval(function() {
@@ -14,10 +14,10 @@ function gameTimer(io, GAME_LENGTH) {
     let timeLeft = endTime - now;
     if (now > endTime) {
       console.log("Time is up.");
-      timeUp(io);
+      timeUp(io, room);
       clearInterval(timer);
     }
-    io.emit("time left", timeLeft);
+    io.to(room).emit("time left", timeLeft);
   }, 1000);
   return timer;
 }
@@ -27,8 +27,8 @@ function stopTimer(timer) {
 }
 
 //Game time has ended. Since no win conditions were met.
-function timeUp(io) {
-  gameOver(io, whoWon(false, false, false));
+function timeUp(io, room) {
+  gameOver(io, room, whoWon(false, false, false));
 }
 
 function whoWon(detectives, spies, liar) {
@@ -44,9 +44,9 @@ function whoWon(detectives, spies, liar) {
 }
 
 //Game over
-function gameOver(io, winners, timer) {
+function gameOver(io, room, winners, timer) {
   //Winners should be an object with win loss for each group of players
-  io.emit("game over", winners);
+  io.to(room).emit("game over", winners);
   stopTimer(timer);
 }
 
@@ -57,6 +57,7 @@ function stopGame(timer){
 //Start Game
 function startGame(
   io,
+  room,
   userList,
   DETECTIVE_ATTEMPT_AMOUNT,
   SPY_ATTEMPT_AMOUNT,
@@ -71,7 +72,7 @@ function startGame(
   //Send roles to each player
   for (user in userList.users) {
     let role = userList.users[user].role;
-    io.to(user).emit("my role", role);
+    io.in(room).to(user).emit("my role", role);
   }
   //Apply number attempts for each role
   applyRoleAttempts(
@@ -86,14 +87,14 @@ function startGame(
   userList.password = getRandomPassword(wordList);
   console.log(`Password is ${userList.password}`);
   //Send half of password to the two spies
-  sendHalfOfPass(io, userList, userList.password);
+  sendHalfOfPass(io, room, userList, userList.password);
   //Send who the other spy is
-  sendOtherSpies(io, userList);
+  sendOtherSpies(io, room, userList);
 
   //Start Timer
-  let timer = gameTimer(io, GAME_LENGTH);
-  io.emit("game start");
-  io.emit("server message", `Starting game!`);
+  let timer = gameTimer(io, room, GAME_LENGTH);
+  io.to(room).emit("game start");
+  io.to(room).emit("server message", `Starting game!`);
   return timer;
 }
 

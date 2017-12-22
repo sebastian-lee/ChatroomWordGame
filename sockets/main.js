@@ -33,34 +33,35 @@ const LIAR_ATTEMPT_AMOUNT = 2;
 //Minutes
 const GAME_LENGTH = 5;
 
-module.exports = function(io) {
-  //User List
-  var userList = {
-    length: 0,
-    order: [],
-    password: [],
-    users: {}
+module.exports = class Chatroom{
+
+  constructor(){
+    //User List
+    this.userList = {
+      length: 0,
+      order: [],
+      password: [],
+      users: {}
+    };
+
+    this.timer = undefined;
+    this.gameInProgress = false;
+    this.connection = this.connection.bind(this);
   };
-
-  var timer;
-  var gameInProgress = false;
-
-  //List of waiting socket ids
-  var waitingForTarget = [];
-
-  io.on("connection", socket => {
+  
+  connection(socket,room,io){
+    console.log(this);
     //New user connection
     //keep track if this user has been added
     let addedUser = false;
-
     /*
      * Add the new user to the list of users
      * with a unique name 
      */
 
-    socket.on("add username", function(username) {
+    socket.in(room).on("add username", (username)=>{
       //Do not let more than the required amount join
-      if (userList.length >= REQUIRED_PLAYERS) {
+      if (this.userList.length >= REQUIRED_PLAYERS) {
         console.log("Enough Players have joined.");
         return;
       }
@@ -69,7 +70,7 @@ module.exports = function(io) {
       username = String(username);
       console.log("new username " + username);
       if (
-        addUser(addedUser, socket, io, username, userList, waitingForTarget)
+        addUser(addedUser, socket, room, username, this.userList)
       ) {
         addedUser = true;
 
@@ -78,124 +79,125 @@ module.exports = function(io) {
         socket.emit("my username", username);
 
         //send updated userlist
-        sendUserList(io, userList);
+        sendUserList(io, room, this.userList);
 
-        console.log(`There are ${userList.length} players.`);
-        if (userList.length < REQUIRED_PLAYERS) {
+        console.log(`There are ${this.userList.length} players.`);
+        if (this.userList.length < REQUIRED_PLAYERS) {
           console.log("Waiting for more players to join");
-          io.emit(
+          io.to(room).emit(
             "server message",
-            `Waiting for ${5 - userList.length} more players to join`
+            `Waiting for ${5 - this.userList.length} more players to join`
           );
         } else {
           //Start Game
-          if (!gameInProgress) {
+          if (!this.gameInProgress) {
             console.log(`There are enough players.`);
             let options = wordDatabase.options;
-            io.to(userList.order[0]).emit("game settings", options);
+            io.to(room).to(this.userList.order[0]).emit("game settings", options);
           }
         }
       }
     });
 
-    socket.on("start game",(wordList)=>{
+    socket.to(room).on("start game",(wordList)=>{
       //Start Game
-      timer = startGame(
+      this.timer = startGame(
         io,
-        userList,
+        room,
+        this.userList,
         DETECTIVE_ATTEMPT_AMOUNT,
         SPY_ATTEMPT_AMOUNT,
         LIAR_ATTEMPT_AMOUNT,
         GAME_LENGTH,
         wordDatabase[wordList]
       );
-      gameInProgress = true;
+      this.gameInProgress = true;
     });
 
     //User has left
     //Remove the user from the list of users
-    socket.on("disconnect", () => {
+    socket.to(room).on("disconnect", () => {
       //Remove User from userlist
-      removeUser(addedUser, socket, io, userList);
+      removeUser(addedUser, socket, io, room, this.userList);
 
       //send updated userlist
-      sendUserList(io, userList);
+      sendUserList(io, room, this.userList);
 
       //If game is in progress, end game
-      if(gameInProgress){
-        gameInProgress = false;
-        stopGame(timer);
+      if(this.gameInProgress){
+        this.gameInProgress = false;
+        stopGame(this.timer);
         console.log("Waiting to start new game");
-        io.emit(
+        io.to(room).emit(
           "server message",
-          `Waiting for ${5 - userList.length} more players to join`
+          `Waiting for ${5 - this.userList.length} more players to join`
         );
       }
     });
 
-    socket.on("chat message", function(msg) {
+    socket.to(room).on("chat message", (msg)=>{
       //Sanitize msg
       msg = String(msg);
 
       //Check if this user was added
       if (addedUser) {
         //Emit message to chatroom
-        socket.broadcast.emit("chat message", {
-          username: userList.users[socket.id].username,
+        socket.to(room).emit("chat message", {
+          username: this.userList.users[socket.id].username,
           msg
         });
 
         socket.emit("self message", {
-          username: userList.users[socket.id].username,
+          username: this.userList.users[socket.id].username,
           msg
         });
       }
     });
 
-    socket.on("typing", function() {
-      if (userList.users[socket.id]) {
-        let username = userList.users[socket.id].username;
-        io.emit("typing", username);
+    socket.to(room).on("typing", ()=>{
+      if (this.userList.users[socket.id]) {
+        let username = this.userList.users[socket.id].username;
+        socket.to(room).emit("typing", username);
       }
     });
 
-    socket.on("stop typing", function() {
-      if (userList.users[socket.id]) {
-        let username = userList.users[socket.id].username;
-        io.emit("stop typing", username);
+    socket.to(room).on("stop typing", ()=>{
+      if (this.userList.users[socket.id]) {
+        let username = this.userList.users[socket.id].username;
+        socket.to(room).emit("stop typing", username);
       }
     });
 
-    socket.on("password submit", function(password) {
+    socket.to(room).on("password submit", (password)=>{
       //Check if password came from a spy
-      if (userList.users[socket.id].role != "spy") return;
+      if (this.userList.users[socket.id].role != "spy") return;
 
       console.log("Checking if password is correct");
       console.log(password);
 
-      let match = checkPassword(password, userList);
+      let match = checkPassword(password, this.userList);
 
-      let attempts = --userList.users[socket.id].attempts;
+      let attempts = --this.userList.users[socket.id].attempts;
       if (match) {
         console.log("Right! Spies win!");
         socket.emit("password result", match, attempts);
-        gameOver(io, whoWon(false, true, false), timer);
-        gameInProgress = false;
+        gameOver(io, room, whoWon(false, true, false), this.timer);
+        this.gameInProgress = false;
       } else {
         console.log("Wrong Pass");
         socket.emit("password result", match, attempts);
       }
 
-      if (userList.users[socket.id].attempts <= 0) {
+      if (this.userList.users[socket.id].attempts <= 0) {
         console.log("GAME OVER: Spies loses");
-        gameOver(io, whoWon(true, false, true), timer);
-        gameInProgress = false;
+        gameOver(io, room, whoWon(true, false, true), this.timer);
+        this.gameInProgress = false;
       }
     });
 
-    socket.on("accused submit", function(accused) {
+    socket.to(room).on("accused submit", (accused)=>{
       //Check if input came from a detective
-      if (userList.users[socket.id].role != "detective") return;
+      if (this.userList.users[socket.id].role != "detective") return;
 
       console.log("Checking if accused is correct");
       console.log(accused);
@@ -203,8 +205,8 @@ module.exports = function(io) {
       let match = false;
       if (accused.length == SPY_AMOUNT) {
         //Get who is a spy and who is a liar
-        let spies = findSpies(userList);
-        let liar = findLiar(userList);
+        let spies = findSpies(this.userList);
+        let liar = findLiar(this.userList);
 
         match = true;
         accused.map(accuse => {
@@ -216,69 +218,70 @@ module.exports = function(io) {
         if (accused.includes(liar)) {
           console.log("Accused the liar!");
 
-          for (user in userList.users) {
-            let role = userList.users[user].role;
+          for (user in this.userList.users) {
+            let role = this.userList.users[user].role;
             if (role == "liar") {
               //Check if this detective has already guessed the liar.
-              if (!userList.users[user].whoGuessedMe.includes(socket)) {
-                userList.users[user].attempts--;
-                userList.users[user].whoGuessedMe.push(socket);
+              if (!this.userList.users[user].whoGuessedMe.includes(socket)) {
+                this.userList.users[user].attempts--;
+                this.userList.users[user].whoGuessedMe.push(socket);
 
                 //If all detectives have guess liars once
-                if (userList.users[user].attempts <= 0) {
+                if (this.userList.users[user].attempts <= 0) {
                   console.log("LIAR WINS!");
-                  gameOver(io, whoWon(false, false, true), timer);
-                  gameInProgress = false;
+                  gameOver(io, room, whoWon(false, false, true), this.timer);
+                  this.gameInProgress = false;
                 }
               }
             }
           }
         }
 
-        let attempts = --userList.users[socket.id].attempts;
+        let attempts = --this.userList.users[socket.id].attempts;
         console.log(`Picked spies: ${match}`);
         if (match) {
           console.log("Detectives win!");
-          gameOver(io, whoWon(true, false, false), timer);
-          gameInProgress = false;
+          gameOver(io, room, whoWon(true, false, false), this.timer);
+          this.gameInProgress = false;
         } else {
           console.log("Did not pick spies");
           socket.emit("accused result", match, attempts);
         }
-        if (userList.users[socket.id].attempts <= 0) {
+        if (this.userList.users[socket.id].attempts <= 0) {
           console.log("GAME OVER: Detectives loses");
-          gameOver(io, whoWon(false, true, true), timer);
-          gameInProgress = false;
+          gameOver(io, room, whoWon(false, true, true), this.timer);
+          this.gameInProgress = false;
         }
       }
     });
 
-    socket.on("restart game", function(restart) {
-      if (restart == true && !gameInProgress) {
-        if (userList.length < REQUIRED_PLAYERS) {
+    socket.to(room).on("restart game", (restart)=>{
+      if (restart == true && !this.gameInProgress) {
+        if (this.userList.length < REQUIRED_PLAYERS) {
           console.log("Waiting for more players to join");
-          io.emit(
+          io.to(room).emit(
             "server message",
-            `Waiting for ${5 - userList.length} more players to join`
+            `Waiting for ${5 - this.userList.length} more players to join`
           );
         } else {
           //Start Game
           console.log(`There are enough players. Starting Game.`);
-          timer = startGame(
+          this.timer = startGame(
             io,
-            userList,
+            room,
+            this.userList,
             DETECTIVE_ATTEMPT_AMOUNT,
             SPY_ATTEMPT_AMOUNT,
             LIAR_ATTEMPT_AMOUNT,
             GAME_LENGTH
           );
-          gameInProgress = true;
+          this.gameInProgress = true;
         }
       }
     });
 
-    socket.on("error", function(err) {
+    socket.to(room).on("error", (err)=>{
       console.log(err);
     });
-  });
+  }
 };

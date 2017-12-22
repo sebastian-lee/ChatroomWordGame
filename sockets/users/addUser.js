@@ -1,7 +1,7 @@
 //Import from Checks
 var checkUniqueUsername = require("../checks/check.js").checkUniqueUsername;
 
-function addUser(addedUser, socket, io, username, userList, waitingForTarget) {
+function addUser(addedUser, socket, room, username, userList) {
   //If the user is already added return
   if (addedUser) {
     console.log("User already added");
@@ -22,7 +22,7 @@ function addUser(addedUser, socket, io, username, userList, waitingForTarget) {
   }
 
   console.log("a user connected");
-  io.emit("user connected", username);
+  socket.to(room).emit("user connected", username);
   
   userList.order.push(socket.id); 
   

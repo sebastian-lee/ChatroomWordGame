@@ -43,6 +43,6 @@ app.use(function(err, req, res, next) {
 });
 
 // import socket logic
-require('./sockets/main.js')(app.io);
+require('./sockets/serverList.js')(app.io);
 
 module.exports = app;
